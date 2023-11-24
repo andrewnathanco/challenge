@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"math/rand"
 	"os"
 	"slices"
 	"strings"
@@ -161,14 +162,13 @@ func main() {
 			if !valid_letter {
 				fmt.Printf("That letter won't form a word eventually try again: ")
 				fmt.Scanln(&user_letter)
-
-				if user_letter == "CHALLENGE" {
-					fmt.Printf("You lose, computer was thinking of: %s\n", comp_word)
-					break
-				}
 			}
 		}
 
+		if user_letter == "CHALLENGE" {
+			fmt.Printf("You lose, computer was thinking of: %s\n", comp_word)
+			break
+		}
 		curr_word += user_letter
 
 		if lo.Contains[string](answers, curr_word) {
@@ -178,27 +178,28 @@ func main() {
 			break
 		}
 
-		found_word := false
-		// here we need to get back options that are far enough away from loosing
+		available_answers := []string{}
 		for _, answer := range answers {
 			word_can_be_used := strings.HasPrefix(answer, curr_word)
 			is_long_enough := len(answer)-len(curr_word) > 2
 			will_let_computer_win := len(answer)%2 == 0
+
 			if word_can_be_used && is_long_enough && will_let_computer_win {
-				comp_word = answer
-				computer_next_letter = answer[len(curr_word)]
-				found_word = true
+				available_answers = append(available_answers, answer)
 			}
 		}
 
-		if !found_word {
+		if len(available_answers) == 0 {
 			// if we can't find that, we need to just grab the next word and lose
 			for _, answer := range answers {
 				if strings.HasPrefix(answer, curr_word) {
 					computer_next_letter = answer[len(curr_word)]
-					found_word = true
 				}
 			}
+		} else {
+			random_answer := rand.Intn(len(available_answers))
+			comp_word = available_answers[random_answer]
+			computer_next_letter = comp_word[len(curr_word)]
 		}
 
 		fmt.Printf("The computer's letter is: %s\n", string(computer_next_letter))
