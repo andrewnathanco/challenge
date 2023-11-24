@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/samber/lo"
@@ -27,15 +28,16 @@ func readCsvFile(filePath string) ([][]string, error) {
 	}
 
 	// get rid of any comments (really just for the wiki)
-	lo.Filter[[]string](records, func(item []string, index int) bool {
+	filtered := lo.Filter[[]string](records, func(item []string, index int) bool {
 		if len(item) != 1 {
 			return false
 		}
 
-		return item[0][0] != '#'
+		// filter out all 2 letter words
+		return len(item[0]) > 2
 	})
 
-	return records, nil
+	return filtered, nil
 }
 
 func must(err error) {
@@ -58,7 +60,7 @@ func doesWordContainAnotherWord(word string, word_by_num [][]string) bool {
 	return doesWordContainAnotherWord(word[0:len(word)-1], word_by_num)
 }
 
-func getAllWords(file_name string) []string {
+func getWordsFromFile(file_name string) []string {
 	records, err := readCsvFile(file_name)
 	must(err)
 
@@ -69,8 +71,10 @@ func getAllWords(file_name string) []string {
 		}
 
 		return item[0]
+		// return strings.ToLower(item[0])
 	})
 }
+
 func elapsed(name string) func() {
 	start := time.Now()
 	return func() {
@@ -78,16 +82,19 @@ func elapsed(name string) func() {
 	}
 }
 
-func main() {
-	all_words := getAllWords("./data/scrabble.csv")
-	common_words := getAllWords("./data/wiki-1m-formatted.csv")
-	all_words = lo.Intersect[string](all_words, common_words)
+func getWords() ([][]string, []string) {
+	all_words := getWordsFromFile("./data/scrabble.csv")
+	medium_common := getWordsFromFile("./data/wiki-1m-formatted.csv")
+	// most_common := getWordsFromFile("./data/wiki-10k-formatted.csv")
+
+	all_words = lo.Intersect[string](all_words, medium_common)
+	// we need to only get the most common to filter off any weird 3 letter words
+	// all_words = lo.Intersect[string](all_words, most_common)
 
 	slices.SortFunc(all_words, func(a, b string) int {
 		return len(b) - len(a)
 	})
 
-	// this is intense, but we need to get the largest word length to create our bucket
 	max_length := len(all_words[0])
 	word_by_num := make([][]string, max_length)
 	for _, word := range all_words {
@@ -96,14 +103,112 @@ func main() {
 		word_by_num[len(word)-1] = append(words_in_this_bucket, word)
 	}
 
+	return word_by_num, all_words
+}
+
+func getAnswerSet() []string {
+	word_buckets, all_words := getWords()
 	defer elapsed("calc_answer_set")()
+
 	answer_set := map[string]struct{}{}
 	for _, word := range all_words {
 		sub_word := word[0 : len(word)-1]
-		if !doesWordContainAnotherWord(sub_word, word_by_num) {
+		if !doesWordContainAnotherWord(sub_word, word_buckets) {
 			answer_set[word] = struct{}{}
 		}
 	}
 
-	fmt.Println(len(answer_set))
+	answer_list := []string{}
+	for word := range answer_set {
+		answer_list = append(answer_list, word)
+	}
+
+	return answer_list
+}
+
+func main() {
+	answers := getAnswerSet()
+
+	game_active := true
+	curr_word := ""
+	comp_word := ""
+	comp_letter := "b"
+	curr_word += comp_letter
+
+	// game loop
+	fmt.Printf("The first letter is: %s\n", comp_letter)
+	var computer_next_letter byte
+	for game_active {
+		fmt.Printf("Enter your letter: ")
+		var user_letter string
+		fmt.Scan(&user_letter)
+
+		if user_letter == "CHALLENGE" {
+			fmt.Printf("You lose, computer was thinking of: %s", comp_word)
+			break
+		}
+
+		// assume its not valid to start
+		valid_letter := false
+		for !valid_letter {
+			for _, answer := range answers {
+				if strings.HasPrefix(answer, curr_word+user_letter) {
+					valid_letter = true
+					break
+				}
+			}
+
+			if !valid_letter {
+				fmt.Printf("That letter won't form a word eventually try again: ")
+				fmt.Scanln(&user_letter)
+
+				if user_letter == "CHALLENGE" {
+					fmt.Printf("You lose, computer was thinking of: %s\n", comp_word)
+					break
+				}
+			}
+		}
+
+		curr_word += user_letter
+
+		if lo.Contains[string](answers, curr_word) {
+			game_active = false
+			fmt.Printf("The word is now: %s\n", curr_word)
+			fmt.Println("you lose")
+			break
+		}
+
+		found_word := false
+		// here we need to get back options that are far enough away from loosing
+		for _, answer := range answers {
+			word_can_be_used := strings.HasPrefix(answer, curr_word)
+			is_long_enough := len(answer)-len(curr_word) > 2
+			will_let_computer_win := len(answer)%2 == 0
+			if word_can_be_used && is_long_enough && will_let_computer_win {
+				comp_word = answer
+				computer_next_letter = answer[len(curr_word)]
+				found_word = true
+			}
+		}
+
+		if !found_word {
+			// if we can't find that, we need to just grab the next word and lose
+			for _, answer := range answers {
+				if strings.HasPrefix(answer, curr_word) {
+					computer_next_letter = answer[len(curr_word)]
+					found_word = true
+				}
+			}
+		}
+
+		fmt.Printf("The computer's letter is: %s\n", string(computer_next_letter))
+		curr_word += string(computer_next_letter)
+		fmt.Printf("The word is now: %s\n", curr_word)
+
+		if lo.Contains[string](answers, curr_word) {
+			game_active = false
+			fmt.Printf("Computer was thinking of: %s\n", comp_word)
+			fmt.Println("computer loses")
+		}
+	}
 }

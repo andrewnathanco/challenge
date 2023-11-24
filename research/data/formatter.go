@@ -10,8 +10,8 @@ import (
 
 func main() {
 	// Specify the file paths
-	inputFilePath := "./wiki-1m-unformatted.txt"
-	outputFilePath := "./wiki-1m-formatted.csv"
+	inputFilePath := "./wiki-10k-unformatted.txt"
+	outputFilePath := "./wiki-10k-formatted.csv"
 
 	// Open the input file
 	inputFile, err := os.Open(inputFilePath)
