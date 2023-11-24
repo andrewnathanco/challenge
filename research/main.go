@@ -41,6 +41,22 @@ func readCsvFile(filePath string) ([][]string, error) {
 	return filtered, nil
 }
 
+func exportToCSV(data []string, filename string) {
+	file, err := os.Create(filename)
+	if err != nil {
+		must(err)
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	err = writer.Write(data)
+	if err != nil {
+		must(err)
+	}
+}
+
 func must(err error) {
 	if err != nil {
 		slog.Error(err.Error())
@@ -72,7 +88,6 @@ func getWordsFromFile(file_name string) []string {
 		}
 
 		return item[0]
-		// return strings.ToLower(item[0])
 	})
 }
 
@@ -129,11 +144,12 @@ func getAnswerSet() []string {
 
 func main() {
 	answers := getAnswerSet()
+	exportToCSV(answers, "./data/challenge_dict.csv")
 
 	game_active := true
 	curr_word := ""
 	comp_word := ""
-	comp_letter := "b"
+	comp_letter := "bo"
 	curr_word += comp_letter
 
 	// game loop
@@ -194,6 +210,7 @@ func main() {
 			for _, answer := range answers {
 				if strings.HasPrefix(answer, curr_word) {
 					computer_next_letter = answer[len(curr_word)]
+					comp_word = answer
 				}
 			}
 		} else {
