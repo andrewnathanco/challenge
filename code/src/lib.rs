@@ -1,27 +1,18 @@
-use leptos::html::P;
-use leptos::{leptos_dom::helpers::window_event_listener, logging::log, *};
+use leptos::leptos_dom::helpers::window_event_listener;
+use leptos::*;
 use leptos_use::storage::use_local_storage;
 use serde::{Deserialize, Serialize};
 
 mod components;
 
 use components::game::*;
+use components::keyboard::*;
+use components::session::*;
 use components::tile::*;
-
-const KEY: &str = "w-8 h-16 bg-gray-300 rounded-lg cursor-pointer";
-const BACK: &str =
-    "w-12 h-16 bg-red-300 rounded-lg cursor-pointer justify-center items-center flex";
-const ENTER: &str =
-    "p-1 h-16 bg-green-300 rounded-lg cursor-pointer items-center justify-center flex";
 
 #[derive(Serialize, Deserialize, Clone)]
 struct User {
     pub name: String,
-}
-#[derive(Serialize, Deserialize, Clone)]
-struct Session {
-    pub tiles: Vec<Tile>,
-    pub selected_letter: String,
 }
 
 #[component]
@@ -52,13 +43,14 @@ pub fn App() -> impl IntoView {
 
     let (game, _, _) = use_local_storage::<Game, Game>("game", game_state);
     let (session, set_session, _) = use_local_storage::<Session, Session>("session", session_state);
-    println!("test");
 
-    let tile_class = move || match session.get().selected_letter.as_str() {
+    // current tile
+    let tile_class = move || match session().selected_letter.as_str() {
         "_" => TILE_EMPTY,
         _ => TILE_OPTION,
     };
 
+    // this grabs the letter from the user, resets the selected and adds the letter as a tile
     let lock_in_letter = move || {
         if session().selected_letter != "_" && session().selected_letter != "" {
             set_session.update(|s| {
@@ -71,6 +63,20 @@ pub fn App() -> impl IntoView {
         }
     };
 
+    let submit_letter = move || {
+        // lock in letter from the user
+        lock_in_letter();
+
+        // get back letter from the computer
+        set_session.update(|s| {
+            s.tiles.push(Tile {
+                letter: "A".to_string(),
+                author: TileAuthor::Computer,
+            });
+        })
+    };
+
+    // currently this just strips the last letter off until it hits the start
     let remove_letter =
         move || {
             set_session.update(|s| {
@@ -115,7 +121,7 @@ pub fn App() -> impl IntoView {
         }
 
         if code == "Enter" {
-            lock_in_letter();
+            submit_letter();
         }
 
         if code == "Backspace" {
@@ -141,88 +147,11 @@ pub fn App() -> impl IntoView {
                 </ul>
             </div>
 
-            <div
-                id="keyboard"
-                class="flex flex-col space-y-1 w-full items-center text-sm text-gray-700"
-            >
-                <div id="top-row" class="flex flex-row space-between space-x-1">
-                    <button
-                        on:click=move |_| {
-                            set_session.update(|s| s.selected_letter = String::from("Q"))
-                        }
-
-                        class=KEY
-                    >
-                        "Q"
-                    </button>
-                    <button
-                        on:click=move |_| {
-                            set_session.update(|s| s.selected_letter = String::from("W"))
-                        }
-
-                        class=KEY
-                    >
-                        "W"
-                    </button>
-                    <button class=KEY>"E"</button>
-                    <button class=KEY>"R"</button>
-                    <button class=KEY>"T"</button>
-                    <button class=KEY>"Y"</button>
-                    <button class=KEY>"U"</button>
-                    <button class=KEY>"I"</button>
-                    <button class=KEY>"O"</button>
-                    <button class=KEY>"P"</button>
-                </div>
-                <div id="middle-row" class="flex flex-row space-between space-x-1">
-                    <button class=KEY>"A"</button>
-                    <button class=KEY>"S"</button>
-                    <button class=KEY>"D"</button>
-                    <button class=KEY>"F"</button>
-                    <button class=KEY>"G"</button>
-                    <button class=KEY>"H"</button>
-                    <button class=KEY>"J"</button>
-                    <button class=KEY>"K"</button>
-                    <button class=KEY>"L"</button>
-                </div>
-                <div id="bottom-row" class="flex flex-row space-between space-x-1">
-                    <button
-                        on:click=move |_| {
-                            lock_in_letter();
-                        }
-
-                        class=ENTER
-                    >
-                        ENTER
-                    </button>
-                    <button class=KEY>"Z"</button>
-                    <button class=KEY>"X"</button>
-                    <button class=KEY>"C"</button>
-                    <button class=KEY>"V"</button>
-                    <button class=KEY>"B"</button>
-                    <button class=KEY>"N"</button>
-                    <button class=KEY>"M"</button>
-                    <button
-                        on:click=move |_| {
-                            remove_letter();
-                        }
-
-                        class=BACK
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            class="w-6 h-6"
-                        >
-                            <path
-                                fill-rule="evenodd"
-                                d="M2.515 10.674a1.875 1.875 0 000 2.652L8.89 19.7c.352.351.829.549 1.326.549H19.5a3 3 0 003-3V6.75a3 3 0 00-3-3h-9.284c-.497 0-.974.198-1.326.55l-6.375 6.374zM12.53 9.22a.75.75 0 10-1.06 1.06L13.19 12l-1.72 1.72a.75.75 0 101.06 1.06l1.72-1.72 1.72 1.72a.75.75 0 101.06-1.06L15.31 12l1.72-1.72a.75.75 0 10-1.06-1.06l-1.72 1.72-1.72-1.72z"
-                                clip-rule="evenodd"
-                            ></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
+            <Keyboard
+                set_session=set_session
+                enter=Box::new(submit_letter)
+                remove=Box::new(remove_letter)
+            />
 
             <div class="flex flex-col space-y-2">
                 <button
