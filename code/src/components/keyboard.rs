@@ -1,6 +1,11 @@
+use leptos::leptos_dom::helpers::window_event_listener;
 use leptos::{logging::log, *};
 use web_sys::Event;
 
+use crate::components::game::{get_game, use_game};
+use crate::components::tile::{Tile, TileAuthor};
+
+use super::game::Game;
 use super::session::Session;
 
 const KEY: &str = "w-8 h-16 bg-gray-300 rounded-lg cursor-pointer";
@@ -17,12 +22,57 @@ const MIDDLE: [&str; 9] = ["A", "S", "D", "F", "G", "H", "J", "K", "L"];
 const BOTTOM: [&str; 7] = ["Z", "X", "C", "V", "B", "N", "M"];
 
 #[component]
-pub fn Keyboard(
-    set_session: WriteSignal<Session>,
-    enter: Box<dyn Fn(bool)>,
-    remove: Box<dyn Fn()>,
-    valid_letter: ReadSignal<bool>,
-) -> impl IntoView {
+pub fn Keyboard(session: ReadSignal<Session>, set_session: WriteSignal<Session>) -> impl IntoView {
+    let (game, _) = use_game();
+
+    // this grabs the letter from the user, resets the selected and adds the letter as a tile
+    let lock_in_letter = move || {
+        if session().selected_letter != "_" && session().selected_letter != "" {
+            set_session.update(|s| {
+                s.tiles.push(Tile {
+                    letter: s.selected_letter.clone(),
+                    author: TileAuthor::User,
+                });
+                s.selected_letter = String::from("_");
+            })
+        }
+    };
+
+    let submit_letter = move |valid_letter: bool| {
+        if valid_letter {
+            if session().selected_letter != "_" {
+                // lock in letter from the user
+                lock_in_letter();
+
+                // get back letter from the computer
+                set_session.update(|s| {
+                    s.tiles.push(Tile {
+                        letter: "A".to_string(),
+                        author: TileAuthor::Computer,
+                    });
+                })
+            }
+        }
+    };
+
+    // currently this just strips the last letter off until it hits the start
+    let remove_letter =
+        move || {
+            set_session.update(|s| {
+                if s.selected_letter != "_" {
+                    s.selected_letter = String::from("_");
+                } else {
+                    if s.tiles.len() > game.get().start_tiles.len() {
+                        // need to strip off users and the last computers, this is a bit dangerous,
+                        // we shouldn't get to an edge case, but it's possible that this could strip off the first few tiles
+                        let (_, tiles) = s.tiles.split_last().unwrap();
+                        let (_, tiles) = tiles.split_last().unwrap();
+                        s.tiles = tiles.to_vec();
+                    }
+                }
+            })
+        };
+
     let top_keys = move || {
         TOP.map(|k| {
             view! { <Key letter={ k }.to_string() set_session=set_session/> }
@@ -41,9 +91,32 @@ pub fn Keyboard(
         })
     };
 
+    let handle_keyboard = window_event_listener(ev::keydown, move |ev| {
+        // ev is typed as KeyboardEvent automatically,
+        // so .code() can be called
+        ev.prevent_default();
+        let code = ev.code();
+        if code.starts_with("Key") {
+            let key = code.strip_prefix("Key").unwrap();
+            set_session.update(|s| s.selected_letter = String::from(key))
+        }
+
+        if code == "Enter" {
+            submit_letter(true);
+        }
+
+        if code == "Backspace" {
+            remove_letter();
+        }
+    });
+
+    on_cleanup(move || {
+        handle_keyboard.remove();
+    });
+
     let enter_class =
         move || {
-            if valid_letter() {
+            if true {
                 ENTER_ENABLED
             } else {
                 ENTER_DISABLED
@@ -63,7 +136,7 @@ pub fn Keyboard(
             </div>
             <div id="bottom-row" class="flex flex-row space-between space-x-1">
                 <button
-                    on:click=move |_| { enter(valid_letter()) }
+                    on:click=move |_| { submit_letter(true) }
 
                     class=enter_class
                 >
@@ -71,7 +144,7 @@ pub fn Keyboard(
                 </button>
                 {bottom_keys}
                 <button
-                    on:click=move |_| { remove() }
+                    on:click=move |_| { remove_letter() }
 
                     class=BACK
                 >
