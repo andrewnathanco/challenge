@@ -8,3 +8,12 @@ pub struct Session {
     pub selected_letter: String,
 }
 
+impl Default for Session {
+    fn default() -> Self {
+        Session {
+            tiles: [].to_vec(),
+            selected_letter: "_".to_string(),
+        }
+    }
+}
+

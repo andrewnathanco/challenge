@@ -3,8 +3,13 @@
 @tailwind utilities;
 
 html {
-  @apply h-full;
+  height: 100%;
 }
+
 body {
-  @apply h-full;
+  height: 100%;
+}
+
+main {
+  height: 100%;
 }

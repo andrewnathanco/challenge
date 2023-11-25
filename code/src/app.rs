@@ -1,0 +1,35 @@
+use crate::{
+    error_template::{AppError, ErrorTemplate},
+    views::index::Index,
+};
+use leptos::*;
+use leptos_meta::*;
+use leptos_router::*;
+
+#[component]
+pub fn App() -> impl IntoView {
+    // Provides context that manages stylesheets, titles, meta tags, etc.
+    provide_meta_context();
+
+    view! {
+        <Stylesheet id="leptos" href="/pkg/challenge.css"/>
+        <Stylesheet href="/style/output.css"/>
+
+        // sets the document title
+        <Title text="Challenge"/>
+
+        // content for this welcome page
+        <Router fallback=|| {
+            let mut outside_errors = Errors::default();
+            outside_errors.insert_with_default_key(AppError::NotFound);
+            view! { <ErrorTemplate outside_errors/> }.into_view()
+        }>
+            <main>
+                <Routes>
+                    <Route path="" view=Index/>
+                </Routes>
+            </main>
+        </Router>
+    }
+}
+

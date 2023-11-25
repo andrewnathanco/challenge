@@ -1,12 +1,16 @@
-use leptos::*;
+use leptos::{logging::log, *};
+use web_sys::Event;
 
 use super::session::Session;
 
 const KEY: &str = "w-8 h-16 bg-gray-300 rounded-lg cursor-pointer";
 const BACK: &str =
     "w-12 h-16 bg-red-300 rounded-lg cursor-pointer justify-center items-center flex";
-const ENTER: &str =
+
+const ENTER_ENABLED: &str =
     "p-1 h-16 bg-green-300 rounded-lg cursor-pointer items-center justify-center flex";
+const ENTER_DISABLED: &str =
+    "p-1 h-16 bg-green-200 rounded-lg cursor-pointer items-center justify-center flex";
 
 const TOP: [&str; 10] = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"];
 const MIDDLE: [&str; 9] = ["A", "S", "D", "F", "G", "H", "J", "K", "L"];
@@ -15,8 +19,9 @@ const BOTTOM: [&str; 7] = ["Z", "X", "C", "V", "B", "N", "M"];
 #[component]
 pub fn Keyboard(
     set_session: WriteSignal<Session>,
-    enter: Box<dyn Fn() + 'static>,
-    remove: Box<dyn Fn() + 'static>,
+    enter: Box<dyn Fn(bool)>,
+    remove: Box<dyn Fn()>,
+    valid_letter: ReadSignal<bool>,
 ) -> impl IntoView {
     let top_keys = move || {
         TOP.map(|k| {
@@ -35,6 +40,16 @@ pub fn Keyboard(
             view! { <Key letter={ k }.to_string() set_session=set_session/> }
         })
     };
+
+    let enter_class =
+        move || {
+            if valid_letter() {
+                ENTER_ENABLED
+            } else {
+                ENTER_DISABLED
+            }
+        };
+
     view! {
         <div
             id="keyboard"
@@ -48,9 +63,9 @@ pub fn Keyboard(
             </div>
             <div id="bottom-row" class="flex flex-row space-between space-x-1">
                 <button
-                    on:click=move |_| { enter() }
+                    on:click=move |_| { enter(valid_letter()) }
 
-                    class=ENTER
+                    class=enter_class
                 >
                     ENTER
                 </button>
