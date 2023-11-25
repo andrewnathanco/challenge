@@ -64,32 +64,36 @@ pub fn App() -> impl IntoView {
     };
 
     let submit_letter = move || {
-        // lock in letter from the user
-        lock_in_letter();
+        if session().selected_letter != "_" {
+            // lock in letter from the user
+            lock_in_letter();
 
-        // get back letter from the computer
-        set_session.update(|s| {
-            s.tiles.push(Tile {
-                letter: "A".to_string(),
-                author: TileAuthor::Computer,
-            });
-        })
+            // get back letter from the computer
+            set_session.update(|s| {
+                s.tiles.push(Tile {
+                    letter: "A".to_string(),
+                    author: TileAuthor::Computer,
+                });
+            })
+        }
     };
 
     // currently this just strips the last letter off until it hits the start
-    let remove_letter =
-        move || {
-            set_session.update(|s| {
-                if s.selected_letter != "_" {
-                    s.selected_letter = String::from("_");
-                } else {
-                    if s.tiles.len() > word_len {
-                        let (_, tiles) = s.tiles.split_last().unwrap();
-                        s.tiles = tiles.to_vec();
-                    }
+    let remove_letter = move || {
+        set_session.update(|s| {
+            if s.selected_letter != "_" {
+                s.selected_letter = String::from("_");
+            } else {
+                if s.tiles.len() > word_len {
+                    // need to strip off users and the last computers, this is a bit dangerous,
+                    // we shouldn't get to an edge case, but it's possible that this could strip off the first few tiles
+                    let (_, tiles) = s.tiles.split_last().unwrap();
+                    let (_, tiles) = tiles.split_last().unwrap();
+                    s.tiles = tiles.to_vec();
                 }
-            })
-        };
+            }
+        })
+    };
 
     let tiles = move || {
         session
