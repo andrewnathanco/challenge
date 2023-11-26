@@ -1,15 +1,14 @@
-use std::string;
-
 use super::{keyboard::get_all_letters, tile::*};
 use csv::ReaderBuilder;
-use leptos::{error::Result, logging::log, server, ServerFnError, *};
+use leptos::{error::Result, *};
 use serde::{Deserialize, Serialize};
 use rand::Rng;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Game {
     pub game_key: i32,
-    pub current_tiles: Vec<Tile>,
+    pub starting_word: String,
+    pub starting_tiles: Vec<Tile>,
     pub available_letters: Vec<String>,
     pub computer_word: String,
 }
@@ -29,7 +28,8 @@ impl Game {
 
         Game {
             game_key: 1,
-            current_tiles: tiles.to_vec(),
+            starting_word: "computer".to_string(),
+            starting_tiles: tiles.to_vec(),
             computer_word: "computer".to_string(),
             available_letters: get_all_letters(),
         }
@@ -40,7 +40,8 @@ impl Default for Game {
     fn default() -> Self {
         Game {
             game_key: 1,
-            current_tiles: [].to_vec(),
+            starting_word: "".to_string(),
+            starting_tiles: [].to_vec(),
             computer_word: "".to_string(),
             available_letters: get_all_letters(),
         }
@@ -56,32 +57,29 @@ pub fn GameHeader() -> impl IntoView {
 
 pub fn use_game() -> (ReadSignal<Game>, WriteSignal<Game>) {
     let (game, set_game) = create_signal(Game::new());
-    let get_words = create_local_resource(||{}, |_| async {get_file().await});
+    let get_word = create_local_resource(||{}, |_| async {get_random_word().await});
 
     create_effect(move |_| {
-        get_words.and_then(|words| {
+        get_word.and_then(|word| {
             set_game.update(|g| {
-                let mut rng = rand::thread_rng();
-                let random_index = rng.gen_range(0..words.len() - 1);
-
-                let starting_word = words[random_index].to_string();
                 let tiles = [
                     Tile{
-                        letter: starting_word.chars().nth(0).unwrap_or_default().to_string(),
+                        letter: word.chars().nth(0).unwrap_or_default().to_string(),
                         author: TileAuthor::Computer,
                     },
                     Tile{
-                        letter: starting_word.chars().nth(1).unwrap_or_default().to_string(),
+                        letter: word.chars().nth(1).unwrap_or_default().to_string(),
                         author: TileAuthor::Computer,
                     },
                     Tile{
-                        letter: starting_word.chars().nth(2).unwrap_or_default().to_string(),
+                        letter: word.chars().nth(2).unwrap_or_default().to_string(),
                         author: TileAuthor::Computer,
                     },
                 ];
 
-                g.current_tiles = tiles.to_vec();
-                g.computer_word = starting_word;
+                g.starting_tiles = tiles.to_vec();
+                g.starting_word = word.to_string();
+                g.computer_word = word.to_string();
             });
         })
     });
@@ -90,7 +88,7 @@ pub fn use_game() -> (ReadSignal<Game>, WriteSignal<Game>) {
     (game, set_game)
 }
 
-async fn get_file() -> Result<Vec<String>> {
+async fn get_words() -> Result<Vec<String>> {
     // make the request
     let response = reqwasm::http::Request::get(&format!(
         "/valid_words.csv",
@@ -115,117 +113,21 @@ async fn get_file() -> Result<Vec<String>> {
         return Ok(available_words)
     }
 
-    Ok(["test".to_string()].to_vec())
+    Ok(["computer".to_string()].to_vec(
+
+    ))
 }
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+async fn get_random_word() -> Result<String> { 
+    let avail_words = get_words().await?;
+    let mut rng = rand::thread_rng();
+    let random_index = rng.gen_range(0..avail_words.len() - 1);
+
+    Ok(avail_words[random_index].to_string())
+}
 
 
 

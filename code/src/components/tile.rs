@@ -42,7 +42,7 @@ pub fn Tiles(session: Signal<Session>) -> impl IntoView {
     let tiles = move || {
         session
             .get()
-            .tiles
+            .starting_tiles
             .into_iter()
             .map(|n| {
                 view! {

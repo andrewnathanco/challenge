@@ -47,7 +47,7 @@ pub fn Keyboard(session: Signal<Session>, set_session: WriteSignal<Session>) -> 
     let lock_in_letter = move || {
         if session().selected_letter != "_" && session().selected_letter != "" {
             set_session.update(|s| {
-                s.tiles.push(Tile {
+                s.starting_tiles.push(Tile {
                     letter: s.selected_letter.clone(),
                     author: TileAuthor::User,
                 });
@@ -64,7 +64,7 @@ pub fn Keyboard(session: Signal<Session>, set_session: WriteSignal<Session>) -> 
 
                 // get back letter from the computer
                 set_session.update(|s| {
-                    s.tiles.push(Tile {
+                    s.starting_tiles.push(Tile {
                         letter: "A".to_string(),
                         author: TileAuthor::Computer,
                     });
@@ -79,12 +79,12 @@ pub fn Keyboard(session: Signal<Session>, set_session: WriteSignal<Session>) -> 
             if s.selected_letter != "_" {
                 s.selected_letter = String::from("_");
             } else {
-                if s.tiles.len() > game.get().current_tiles.len() {
+                if s.starting_tiles.len() > game.get().starting_tiles.len() {
                     // need to strip off users and the last computers, this is a bit dangerous,
                     // we shouldn't get to an edge case, but it's possible that this could strip off the first few tiles
-                    let (_, tiles) = s.tiles.split_last().unwrap();
+                    let (_, tiles) = s.starting_tiles.split_last().unwrap();
                     let (_, tiles) = tiles.split_last().unwrap();
-                    s.tiles = tiles.to_vec();
+                    s.starting_tiles = tiles.to_vec();
                 }
             }
         })
