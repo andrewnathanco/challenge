@@ -51,9 +51,12 @@ func exportToCSV(data []string, filename string) {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	err = writer.Write(data)
-	if err != nil {
-		must(err)
+	// Write each item in the data slice on a new line
+	for _, item := range data {
+		err := writer.Write([]string{item})
+		if err != nil {
+			must(err)
+		}
 	}
 }
 

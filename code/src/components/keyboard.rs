@@ -79,7 +79,7 @@ pub fn Keyboard(session: Signal<Session>, set_session: WriteSignal<Session>) -> 
             if s.selected_letter != "_" {
                 s.selected_letter = String::from("_");
             } else {
-                if s.tiles.len() > game.get().current_word.len() {
+                if s.tiles.len() > game.get().current_tiles.len() {
                     // need to strip off users and the last computers, this is a bit dangerous,
                     // we shouldn't get to an edge case, but it's possible that this could strip off the first few tiles
                     let (_, tiles) = s.tiles.split_last().unwrap();

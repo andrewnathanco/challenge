@@ -36,7 +36,7 @@ pub fn SessionView() -> impl IntoView {
                         set_session
                             .update(|s| {
                                 s.selected_letter = String::from("_");
-                                s.tiles = game().current_word.to_vec();
+                                s.tiles = game().current_tiles.to_vec();
                             })
                     }
 
