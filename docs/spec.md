@@ -3,7 +3,7 @@
 - [ ] figure out local storage for:
   - [ ] stats
   - [ ] current session
-- [ ] stats dialog
+- [x] stats dialog
 - [ ] server actions for
   - [ ] getting a letter back from the server
   - [ ] get available letters
