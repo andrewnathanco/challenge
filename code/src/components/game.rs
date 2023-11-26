@@ -1,26 +1,31 @@
 use leptos::{server, ServerFnError, *};
 use serde::{Deserialize, Serialize};
-
-use super::tile::{Tile, TileAuthor};
+use super::{tile::*, keyboard::get_all_letters};
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Game {
     pub game_key: i32,
-    pub start_tiles: Vec<Tile>,
+    pub current_word: Vec<Tile>,
+    pub available_letters: Vec<String>,
+    pub computer_word: String,
 }
 
 impl Default for Game {
     fn default() -> Self {
         Game {
             game_key: 0,
-            start_tiles: [].to_vec(),
+            current_word: [].to_vec(),
+            computer_word: "".to_string(),
+            available_letters: get_all_letters(),
         }
     }
 }
 
 // game.rs
 #[server]
-pub async fn get_game() -> Result<Game, ServerFnError> {
+pub async fn get_game(
+    new_word: Vec<Tile>
+) -> Result<Game, ServerFnError> {
     let word =
         [
             Tile {
@@ -28,14 +33,16 @@ pub async fn get_game() -> Result<Game, ServerFnError> {
                 author: TileAuthor::Computer,
             },
             Tile {
-                letter: String::from("a"),
+                letter: String::from("o"),
                 author: TileAuthor::Computer,
             },
         ];
 
     let game_state = Game {
         game_key: 1,
-        start_tiles: word.to_vec(),
+        current_word: word.to_vec(),
+        computer_word: "computer".to_string(),
+        available_letters: get_all_letters(),
     };
 
     Ok(game_state)
@@ -44,7 +51,7 @@ pub async fn get_game() -> Result<Game, ServerFnError> {
 #[component]
 pub fn GameHeader() -> impl IntoView {
     let game =
-        create_resource(|| (), |_| async { get_game().await });
+        create_resource(|| (), |_| async { get_game([].to_vec()).await });
     let game_view = move || {
         game.and_then(|game|  
             {
@@ -63,7 +70,7 @@ pub fn GameHeader() -> impl IntoView {
 pub fn use_game() -> (ReadSignal<Game>, WriteSignal<Game>)  {
     let (game, set_game) = create_signal(Game::default());
     let game_res =
-        create_resource(|| (), |_| async { get_game().await });
+        create_resource(|| (), |_| async { get_game([].to_vec()).await });
 
     // take that response and get back our current game for the session
     create_effect(move |_| {
@@ -72,6 +79,34 @@ pub fn use_game() -> (ReadSignal<Game>, WriteSignal<Game>)  {
 
     (game, set_game)
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

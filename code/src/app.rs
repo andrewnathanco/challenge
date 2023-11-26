@@ -13,7 +13,6 @@ pub fn App() -> impl IntoView {
 
     view! {
         <Stylesheet id="leptos" href="/pkg/challenge.css"/>
-        <Stylesheet href="/style/output.css"/>
 
         // sets the document title
         <Title text="Challenge"/>

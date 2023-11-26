@@ -18,13 +18,13 @@ pub const TILE_OKAY: &str =
 pub const TILE_NOT_OKAY: &str =
     "w-16 h-20 border-2 border-red-600 rounded-lg flex justify-center items-center text-red-600";
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub enum TileAuthor {
     Computer,
     User,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Tile {
     pub letter: String,
     pub author: TileAuthor,

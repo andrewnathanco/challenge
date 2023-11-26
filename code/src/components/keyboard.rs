@@ -1,11 +1,8 @@
-use leptos::leptos_dom::helpers::window_event_listener;
-use leptos::{logging::log, *};
-use web_sys::Event;
-
-use crate::components::game::{get_game, use_game};
+use crate::components::game::use_game;
 use crate::components::tile::{Tile, TileAuthor};
+use leptos::leptos_dom::helpers::window_event_listener;
+use leptos::*;
 
-use super::game::Game;
 use super::session::Session;
 
 const KEY: &str = "w-8 h-16 bg-gray-300 rounded-lg cursor-pointer";
@@ -20,6 +17,27 @@ const ENTER_DISABLED: &str =
 const TOP: [&str; 10] = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"];
 const MIDDLE: [&str; 9] = ["A", "S", "D", "F", "G", "H", "J", "K", "L"];
 const BOTTOM: [&str; 7] = ["Z", "X", "C", "V", "B", "N", "M"];
+
+pub fn get_all_letters() -> Vec<String> {
+    let mut all_letters: Vec<String> = Vec::new();
+
+    // Add letters from TOP array
+    for &letter in TOP.iter() {
+        all_letters.push(letter.to_string());
+    }
+
+    // Add letters from MIDDLE array
+    for &letter in MIDDLE.iter() {
+        all_letters.push(letter.to_string());
+    }
+
+    // Add letters from BOTTOM array
+    for &letter in BOTTOM.iter() {
+        all_letters.push(letter.to_string());
+    }
+
+    all_letters
+}
 
 #[component]
 pub fn Keyboard(session: ReadSignal<Session>, set_session: WriteSignal<Session>) -> impl IntoView {
@@ -56,22 +74,21 @@ pub fn Keyboard(session: ReadSignal<Session>, set_session: WriteSignal<Session>)
     };
 
     // currently this just strips the last letter off until it hits the start
-    let remove_letter =
-        move || {
-            set_session.update(|s| {
-                if s.selected_letter != "_" {
-                    s.selected_letter = String::from("_");
-                } else {
-                    if s.tiles.len() > game.get().start_tiles.len() {
-                        // need to strip off users and the last computers, this is a bit dangerous,
-                        // we shouldn't get to an edge case, but it's possible that this could strip off the first few tiles
-                        let (_, tiles) = s.tiles.split_last().unwrap();
-                        let (_, tiles) = tiles.split_last().unwrap();
-                        s.tiles = tiles.to_vec();
-                    }
+    let remove_letter = move || {
+        set_session.update(|s| {
+            if s.selected_letter != "_" {
+                s.selected_letter = String::from("_");
+            } else {
+                if s.tiles.len() > game.get().current_word.len() {
+                    // need to strip off users and the last computers, this is a bit dangerous,
+                    // we shouldn't get to an edge case, but it's possible that this could strip off the first few tiles
+                    let (_, tiles) = s.tiles.split_last().unwrap();
+                    let (_, tiles) = tiles.split_last().unwrap();
+                    s.tiles = tiles.to_vec();
                 }
-            })
-        };
+            }
+        })
+    };
 
     let top_keys = move || {
         TOP.map(|k| {

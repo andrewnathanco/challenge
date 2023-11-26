@@ -26,7 +26,7 @@ pub fn use_session() -> (leptos::ReadSignal<Session>, leptos::WriteSignal<Sessio
                 author: TileAuthor::Computer,
             },
             Tile {
-                letter: String::from("a"),
+                letter: String::from("o"),
                 author: TileAuthor::Computer,
             },
         ];
@@ -55,7 +55,7 @@ pub fn SessionView() -> impl IntoView {
                         set_session
                             .update(|s| {
                                 s.selected_letter = String::from("_");
-                                s.tiles = game().start_tiles.to_vec();
+                                s.tiles = game().current_word.to_vec();
                             })
                     }
 
