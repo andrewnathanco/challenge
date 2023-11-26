@@ -40,7 +40,7 @@ pub fn get_all_letters() -> Vec<String> {
 }
 
 #[component]
-pub fn Keyboard(session: ReadSignal<Session>, set_session: WriteSignal<Session>) -> impl IntoView {
+pub fn Keyboard(session: Signal<Session>, set_session: WriteSignal<Session>) -> impl IntoView {
     let (game, _) = use_game();
 
     // this grabs the letter from the user, resets the selected and adds the letter as a tile

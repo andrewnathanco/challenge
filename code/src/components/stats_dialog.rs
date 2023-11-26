@@ -1,6 +1,3 @@
-use std::time::Duration;
-
-use chrono::Local;
 use leptos::*;
 
 #[component]
@@ -9,8 +6,6 @@ pub fn StatsDialog(
     set_dialog_status: WriteSignal<bool>,
 ) -> impl IntoView {
     // Get the current local time
-    let (curr_time, set_curr_time) = create_signal(Local::now());
-
     let display_class =
         move || {
             if is_open() {

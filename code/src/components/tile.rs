@@ -31,7 +31,7 @@ pub struct Tile {
 }
 
 #[component]
-pub fn Tiles(session: ReadSignal<Session>) -> impl IntoView {
+pub fn Tiles(session: Signal<Session>) -> impl IntoView {
     // current tile
     let tile_class = move || match session().selected_letter.to_uppercase().as_str() {
         "_" => TILE_EMPTY,

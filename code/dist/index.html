@@ -1,0 +1,50 @@
+<!DOCTYPE html><html><head>
+    <meta charset="utf-8">
+    <script type="module">import init from '/challenge-fc81bd728731d4aa.js';init('/challenge-fc81bd728731d4aa_bg.wasm');</script>
+    
+    <link rel="stylesheet" href="/output-b6e487ebed8a8c42.css">
+    <link href="/valid_words.csv">
+
+    <meta name="author" content="Andrew Nathan">
+    <meta name="title" content="Challenge">
+    <meta name="description" content="Challenge is a daily word puzzle where you have to beat the computer.">
+    <meta name="keywords" content="challenge, mural, wordle, nytimesgames, nytimes, puzzle, daily, game, puzzles, games, worldle, globle, words">
+    <meta name="robots" content="index, follow">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="language" content="English">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Challenge</title>
+  
+<link rel="preload" href="/challenge-fc81bd728731d4aa_bg.wasm" as="fetch" type="application/wasm" crossorigin="">
+<link rel="modulepreload" href="/challenge-fc81bd728731d4aa.js"></head>
+  <body class="h-full">
+
+<script>(function () {
+    var protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    var url = protocol + '//' + window.location.host + '/_trunk/ws';
+    var poll_interval = 5000;
+    var reload_upon_connect = () => {
+        window.setTimeout(
+            () => {
+                // when we successfully reconnect, we'll force a
+                // reload (since we presumably lost connection to
+                // trunk due to it being killed, so it will have
+                // rebuilt on restart)
+                var ws = new WebSocket(url);
+                ws.onopen = () => window.location.reload();
+                ws.onclose = reload_upon_connect;
+            },
+            poll_interval);
+    };
+
+    var ws = new WebSocket(url);
+    ws.onmessage = (ev) => {
+        const msg = JSON.parse(ev.data);
+        if (msg.reload) {
+            window.location.reload();
+        }
+    };
+    ws.onclose = reload_upon_connect;
+})()
+</script></body></html>

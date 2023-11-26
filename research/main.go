@@ -106,6 +106,9 @@ func getWords() ([][]string, []string) {
 	all_words = lo.Intersect[string](all_words, medium_common)
 	// we need to only get the most common to filter off any weird 3 letter words
 	// all_words = lo.Intersect[string](all_words, most_common)
+	all_words = lo.Filter(all_words, func(item string, index int) bool {
+		return len(item) > 3
+	})
 
 	slices.SortFunc(all_words, func(a, b string) int {
 		return len(b) - len(a)
@@ -114,9 +117,10 @@ func getWords() ([][]string, []string) {
 	max_length := len(all_words[0])
 	word_by_num := make([][]string, max_length)
 	for _, word := range all_words {
-		words_in_this_bucket := word_by_num[len(word)-1]
-
-		word_by_num[len(word)-1] = append(words_in_this_bucket, word)
+		if len(word) > 3 {
+			words_in_this_bucket := word_by_num[len(word)-1]
+			word_by_num[len(word)-1] = append(words_in_this_bucket, word)
+		}
 	}
 
 	return word_by_num, all_words
