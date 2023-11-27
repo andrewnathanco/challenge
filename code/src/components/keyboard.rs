@@ -45,27 +45,27 @@ pub fn Keyboard(session: Signal<Session>, set_session: WriteSignal<Session>) -> 
 
     // this grabs the letter from the user, resets the selected and adds the letter as a tile
     let lock_in_letter = move || {
-        if session().selected_letter != "_" && session().selected_letter != "" {
+        if session().selected_letter != '_' {
             set_session.update(|s| {
                 s.starting_tiles.push(Tile {
                     letter: s.selected_letter.clone(),
                     author: TileAuthor::User,
                 });
-                s.selected_letter = String::from("_");
+                s.selected_letter = '_';
             })
         }
     };
 
     let submit_letter = move |valid_letter: bool| {
         if valid_letter {
-            if session().selected_letter != "_" {
+            if session().selected_letter != '_' {
                 // lock in letter from the user
                 lock_in_letter();
 
                 // get back letter from the computer
                 set_session.update(|s| {
                     s.starting_tiles.push(Tile {
-                        letter: "A".to_string(),
+                        letter: 'A',
                         author: TileAuthor::Computer,
                     });
                 })
@@ -76,8 +76,8 @@ pub fn Keyboard(session: Signal<Session>, set_session: WriteSignal<Session>) -> 
     // currently this just strips the last letter off until it hits the start
     let remove_letter = move || {
         set_session.update(|s| {
-            if s.selected_letter != "_" {
-                s.selected_letter = String::from("_");
+            if s.selected_letter != '_' {
+                s.selected_letter = '_';
             } else {
                 if s.starting_tiles.len() > game.get().starting_tiles.len() {
                     // need to strip off users and the last computers, this is a bit dangerous,
@@ -115,7 +115,7 @@ pub fn Keyboard(session: Signal<Session>, set_session: WriteSignal<Session>) -> 
         let code = ev.code();
         if code.starts_with("Key") {
             let key = code.strip_prefix("Key").unwrap();
-            set_session.update(|s| s.selected_letter = String::from(key))
+            set_session.update(|s| s.selected_letter = key.chars().nth(0).unwrap_or_default())
         }
 
         if code == "Enter" {
@@ -189,7 +189,9 @@ pub fn Key(letter: String, set_session: WriteSignal<Session>) -> impl IntoView {
     let lett = letter.clone();
     view! {
         <button
-            on:click=move |_| { set_session.update(|s| s.selected_letter = lett.clone()) }
+            on:click=move |_| {
+                set_session.update(|s| s.selected_letter = lett.chars().nth(0).unwrap_or_default())
+            }
 
             class=KEY
         >

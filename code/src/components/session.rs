@@ -7,7 +7,7 @@ use crate::components::{game::*, keyboard::Keyboard, tile::*};
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Session {
     pub starting_tiles: Vec<Tile>,
-    pub selected_letter: String,
+    pub selected_letter: char,
     pub starting_word: String,
 }
 
@@ -16,7 +16,7 @@ impl Default for Session {
         Session {
             starting_tiles: [].to_vec(),
             starting_word: "".to_string(),
-            selected_letter: "_".to_string(),
+            selected_letter: '_',
         }
     }
 }
@@ -37,7 +37,7 @@ pub fn SessionView() -> impl IntoView {
                     on:click=move |_| {
                         set_session
                             .update(|s| {
-                                s.selected_letter = String::from("_");
+                                s.selected_letter = '_';
                                 s.starting_tiles = game().starting_tiles.to_vec();
                             })
                     }

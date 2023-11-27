@@ -156,7 +156,7 @@ func main() {
 	game_active := true
 	curr_word := ""
 	comp_word := ""
-	comp_letter := "bo"
+	comp_letter := "me"
 	curr_word += comp_letter
 
 	// game loop

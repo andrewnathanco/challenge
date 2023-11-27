@@ -1,9 +1,10 @@
 # TODO
 
-- [ ] figure out local storage for:
+- [x] figure out local storage for:
   - [ ] stats
-  - [ ] current session
+  - [x] current session
 - [x] stats dialog
-- [ ] server actions for
-  - [ ] getting a letter back from the server
+- [ ] client actions for
+  - [x] getting a random letter back from the server
+  - [ ] getting a playable letter back from the computer
   - [ ] get available letters
