@@ -20,7 +20,7 @@ pub fn Index() -> impl IntoView {
             <div class="flex space-y-2 flex-col items-center h-full">
                 <GameHeader/>
                 <div class="text-base text-center">
-                    "Alternating with the computer, try to make the longest word one letter at a time. You win if the computer is the one to finish the spelling of a word."
+                    "Alternating with the computer, try to make the longest word one letter at a time. You lose if you are the one to finish the word."
                 </div>
                 <SessionView/>
                 <button

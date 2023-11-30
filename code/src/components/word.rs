@@ -38,11 +38,13 @@ pub async fn get_word() -> Result<String> {
     Ok(avail_words[0].to_string())
 }
 
+
 pub async fn get_available_letters(
     tiles: Vec<Tile>
 ) -> Result<Vec<char>> {
     let mut letters :HashSet<char>=  HashSet::new();
     let curr_word = convert_tiles_to_word(tiles);
+    log!("Current Word: {:?}", curr_word);
     let len_curr_word = curr_word.len();
     for word in get_words().await.unwrap() {
         if word.starts_with(&curr_word) {
@@ -53,46 +55,4 @@ pub async fn get_available_letters(
 
     Ok(letters.into_iter().collect())
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

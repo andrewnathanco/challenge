@@ -1,18 +1,13 @@
 use crate::components::game::use_game;
 use crate::components::tile::{Tile, TileAuthor};
+use crate::components::word::get_available_letters;
 use leptos::leptos_dom::helpers::window_event_listener;
-use leptos::*;
+use leptos::{*, logging::log};
 
+use super::computer::get_tile_from_computer;
 use super::session::Session;
+use super::game::Game;
 
-const KEY: &str = "w-8 h-16 bg-gray-300 rounded-lg cursor-pointer";
-const BACK: &str =
-    "w-12 h-16 bg-red-300 rounded-lg cursor-pointer justify-center items-center flex";
-
-const ENTER_ENABLED: &str =
-    "p-1 h-16 bg-green-300 rounded-lg cursor-pointer items-center justify-center flex";
-const ENTER_DISABLED: &str =
-    "p-1 h-16 bg-green-200 rounded-lg cursor-pointer items-center justify-center flex";
 
 const TOP: [&str; 10] = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"];
 const MIDDLE: [&str; 9] = ["A", "S", "D", "F", "G", "H", "J", "K", "L"];
@@ -40,86 +35,118 @@ pub fn get_all_letters() -> Vec<String> {
 }
 
 #[component]
-pub fn Keyboard(session: Signal<Session>, set_session: WriteSignal<Session>) -> impl IntoView {
-    let (game, _) = use_game();
+pub fn Keyboard(
+) -> impl IntoView {
+    let (game, set_game) = use_game();
+
+
+    let set_tile_from_comp = 
+        create_action(move |tiles: &Vec<Tile>| {
+            let new_tiles = tiles.clone();
+            let mut new_game = game();
+            async move {
+                let tile = get_tile_from_computer(new_tiles.clone()).await.unwrap();
+                new_game.current_tiles.push(tile);
+                let avail_lett = get_available_letters(new_game.current_tiles.clone()).await.unwrap();
+                new_game.available_letters = avail_lett;
+                set_game.set(new_game)
+            }
+    });
+
+    let set_available_letters = 
+        create_action(move |tiles: &Vec<Tile>| {
+            let new_tiles = tiles.clone();
+            let mut new_game = game();
+            async move {
+                let avail_lett = get_available_letters(new_tiles).await.unwrap();
+                new_game.available_letters = avail_lett;
+                set_game.set(new_game)
+            }
+    });
 
     // this grabs the letter from the user, resets the selected and adds the letter as a tile
     let lock_in_letter = move || {
-        if session().selected_letter != '_' {
-            set_session.update(|s| {
-                s.starting_tiles.push(Tile {
-                    letter: s.selected_letter.clone(),
+        let selected_letter = game().selected_letter;
+        if game().selected_letter != '_' {
+            // update the selected letter
+            set_game.update(|g| {
+                g.current_tiles.push(Tile {
+                    letter: selected_letter,
                     author: TileAuthor::User,
                 });
-                s.selected_letter = '_';
-            })
+
+                g.selected_letter = '_';
+            });
         }
     };
 
     let submit_letter = move |valid_letter: bool| {
         if valid_letter {
-            if session().selected_letter != '_' {
+            if game().selected_letter != '_' {
                 // lock in letter from the user
                 lock_in_letter();
 
-                // get back letter from the computer
-                set_session.update(|s| {
-                    s.starting_tiles.push(Tile {
-                        letter: 'A',
-                        author: TileAuthor::Computer,
-                    });
-                })
+                set_tile_from_comp.dispatch(game().current_tiles)
             }
         }
     };
 
     // currently this just strips the last letter off until it hits the start
     let remove_letter = move || {
-        set_session.update(|s| {
-            if s.selected_letter != '_' {
-                s.selected_letter = '_';
-            } else {
-                if s.starting_tiles.len() > game.get().starting_tiles.len() {
-                    // need to strip off users and the last computers, this is a bit dangerous,
-                    // we shouldn't get to an edge case, but it's possible that this could strip off the first few tiles
-                    let (_, tiles) = s.starting_tiles.split_last().unwrap();
-                    let (_, tiles) = tiles.split_last().unwrap();
-                    s.starting_tiles = tiles.to_vec();
-                }
-            }
-        })
-    };
+        if game().selected_letter != '_' {
+            set_game.update(|g| {
+                g.selected_letter = '_';
+            });
+            return
+        }
+        let curr_tiles = game().current_tiles.clone();
+        let len_curr = game().current_tiles.len();
+        let len_starting = game().starting_tiles.len();
+
+        // this makes sure we don't go past the starting tiles
+        let enough_tiles_to_strip = len_curr  > len_starting;
+        if enough_tiles_to_strip {
+            set_game.update(|g| {
+                let (_, tiles) = curr_tiles.split_last().unwrap();
+                let (_, tiles) = tiles.split_last().unwrap();
+                g.current_tiles = tiles.to_vec();
+            });
+
+            set_available_letters.dispatch(game().current_tiles)
+        }
+     };
 
     let top_keys = move || {
         TOP.map(|k| {
-            view! { <Key letter={ k }.to_string() set_session=set_session/> }
+            view! { <Key letter={ k }.to_string() set_game=set_game/> }
         })
     };
 
     let middle_keys = move || {
         MIDDLE.map(|k| {
-            view! { <Key letter={ k }.to_string() set_session=set_session/> }
+            view! { <Key letter={ k }.to_string() set_game=set_game/> }
         })
     };
 
     let bottom_keys = move || {
         BOTTOM.map(|k| {
-            view! { <Key letter={ k }.to_string() set_session=set_session/> }
+            view! { <Key letter={ k }.to_string() set_game=set_game/> }
         })
     };
 
+    // this makes sure that users can use their keyboard instead of the on-screen one
     let handle_keyboard = window_event_listener(ev::keydown, move |ev| {
-        // ev is typed as KeyboardEvent automatically,
-        // so .code() can be called
         ev.prevent_default();
         let code = ev.code();
         if code.starts_with("Key") {
             let key = code.strip_prefix("Key").unwrap();
-            set_session.update(|s| s.selected_letter = key.chars().nth(0).unwrap_or_default())
+            set_game.update(|game| 
+                game.selected_letter = key.chars().nth(0).unwrap_or_default()
+            )
         }
 
         if code == "Enter" {
-            submit_letter(true);
+            submit_letter(game().available_letters.contains(&game().selected_letter));
         }
 
         if code == "Backspace" {
@@ -130,15 +157,6 @@ pub fn Keyboard(session: Signal<Session>, set_session: WriteSignal<Session>) -> 
     on_cleanup(move || {
         handle_keyboard.remove();
     });
-
-    let enter_class =
-        move || {
-            if true {
-                ENTER_ENABLED
-            } else {
-                ENTER_DISABLED
-            }
-        };
 
     view! {
         <div
@@ -153,9 +171,11 @@ pub fn Keyboard(session: Signal<Session>, set_session: WriteSignal<Session>) -> 
             </div>
             <div id="bottom-row" class="flex flex-row space-between space-x-1">
                 <button
-                    on:click=move |_| { submit_letter(true) }
+                    on:click=move |_| {
+                        submit_letter(game().available_letters.contains(&game().selected_letter))
+                    }
 
-                    class=enter_class
+                    class="p-1 h-16 bg-green-300 rounded-lg cursor-pointer items-center justify-center flex"
                 >
                     ENTER
                 </button>
@@ -163,7 +183,7 @@ pub fn Keyboard(session: Signal<Session>, set_session: WriteSignal<Session>) -> 
                 <button
                     on:click=move |_| { remove_letter() }
 
-                    class=BACK
+                    class="w-12 h-16 bg-red-300 rounded-lg cursor-pointer justify-center items-center flex"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -184,19 +204,200 @@ pub fn Keyboard(session: Signal<Session>, set_session: WriteSignal<Session>) -> 
 }
 
 #[component]
-pub fn Key(letter: String, set_session: WriteSignal<Session>) -> impl IntoView {
+pub fn Key(letter: String, set_game: WriteSignal<Game>) -> impl IntoView {
     // needed because we are doing some cloning
     let lett = letter.clone();
     view! {
         <button
             on:click=move |_| {
-                set_session.update(|s| s.selected_letter = lett.chars().nth(0).unwrap_or_default())
+                set_game.update(|g| g.selected_letter = lett.chars().nth(0).unwrap_or_default())
             }
 
-            class=KEY
+            class="w-8 h-16 bg-gray-300 rounded-lg cursor-pointer"
         >
             {letter}
         </button>
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

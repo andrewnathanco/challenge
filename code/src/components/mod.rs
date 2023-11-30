@@ -1,3 +1,4 @@
+pub mod computer;
 pub mod game;
 pub mod keyboard;
 pub mod session;

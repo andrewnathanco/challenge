@@ -1,6 +1,8 @@
 use super::{keyboard::get_all_letters, tile::*, word::get_available_letters};
 use chrono::prelude::*;
-use leptos::{*, logging::log};
+use leptos::{*,error::Result, logging::log};
+use leptos_use::storage::use_local_storage;
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 
 use crate::components::word::get_word;
@@ -10,12 +12,14 @@ pub struct Game {
     pub game_key: i64,
     pub starting_word: String,
     pub starting_tiles: Vec<Tile>,
-    pub available_letters: Vec<String>,
-    pub computer_word: String,
+    pub starting_letters: Vec<char>,
+    pub selected_letter: char,
+    pub available_letters: Vec<char>,
+    pub current_tiles: Vec<Tile>
 }
 
 impl Game {
-    fn new() -> Self {
+    pub fn new() -> Self {
         let tiles = [
             Tile {
                 letter: 'c',
@@ -28,11 +32,13 @@ impl Game {
         ];
 
         Game {
-            game_key: 1,
+            selected_letter: '_',
+            game_key: 0,
             starting_word: "computer".to_string(),
             starting_tiles: tiles.to_vec(),
-            computer_word: "computer".to_string(),
-            available_letters: get_all_letters(),
+            available_letters: Vec::new(),
+            starting_letters: Vec::new(),
+            current_tiles: tiles.to_vec(),
         }
     }
 }
@@ -40,73 +46,85 @@ impl Game {
 impl Default for Game {
     fn default() -> Self {
         Game {
-            game_key: 1,
+            selected_letter: '_',
+            game_key: 0,
             starting_word: "".to_string(),
             starting_tiles: [].to_vec(),
-            computer_word: "".to_string(),
-            available_letters: get_all_letters(),
+            starting_letters: Vec::new(),
+            available_letters: Vec::new(),
+            current_tiles: [].to_vec(),
         }
     }
 }
 
 
-pub fn use_game(
-) -> (ReadSignal<Game>, WriteSignal<Game>) {
-    let (game, set_game) = create_signal(Game::new());
+impl PartialEq for Game {
+    fn eq(&self, other: &Self) -> bool {
+        self.game_key == other.game_key
+    }
+}
 
-    // get game key from the date
-    let game_key = get_game_key();
+pub fn use_game(
+) -> (Signal<Game>, WriteSignal<Game>) {
+    let (game, set_game, _) = use_local_storage("game", Game::new());
 
     // get word
-    let get_word = create_local_resource(
-        move || {}, |_|async {get_word().await}
+    let get_new_game = create_local_resource(
+        move || {}, |_|async {get_new_game().await}
     );
 
-    let tiles = [
-        Tile{
-            letter: "attract".chars().nth(0).unwrap_or_default(),
-            author: TileAuthor::Computer,
-        },
-        Tile{
-            letter: "attract".chars().nth(1).unwrap_or_default(),
-            author: TileAuthor::Computer,
-        },
-        Tile{
-            letter: "attract".chars().nth(2).unwrap_or_default(),
-            author: TileAuthor::Computer,
-        },
-    ];
-
     create_effect(move |_| {
-
-
-        get_word.and_then(|word| {
-            set_game.update(|g| {
-                let tiles = [
-                    Tile{
-                        letter: word.chars().nth(0).unwrap_or_default(),
-                        author: TileAuthor::Computer,
-                    },
-                    Tile{
-                        letter: word.chars().nth(1).unwrap_or_default(),
-                        author: TileAuthor::Computer,
-                    },
-                    Tile{
-                        letter: word.chars().nth(2).unwrap_or_default(),
-                        author: TileAuthor::Computer,
-                    },
-                ];
-
-                g.starting_tiles = tiles.to_vec();
-                g.starting_word = word.to_string();
-                g.computer_word = word.to_string();
-                g.game_key = game_key
-            });
+        get_new_game.and_then(|new_game| {
+            if new_game.game_key != game().game_key {
+                set_game.set(new_game.clone());
+            }
         })
     });
 
 
     (game, set_game)
+}
+
+pub async fn get_new_game() -> Result<Game> {
+    let word = get_word().await.unwrap_or_default();
+    let mut rng = rand::thread_rng();
+    let num_chars = rng.gen_range(0..3);
+    let mut tiles: Vec<Tile> = Vec::new();
+
+
+    let chars = word.chars().take(num_chars);
+    for char in chars {
+        tiles.push(Tile{
+            letter: char,
+            author: TileAuthor::Computer,
+        })
+    }
+
+    let tiles = [
+        Tile{
+            letter: word.chars().nth(0).unwrap_or_default(),
+            author: TileAuthor::Computer,
+        },
+        Tile{
+            letter: word.chars().nth(1).unwrap_or_default(),
+            author: TileAuthor::Computer,
+        },
+        Tile{
+            letter: word.chars().nth(2).unwrap_or_default(),
+            author: TileAuthor::Computer,
+        },
+    ];
+
+    let avail_letters = get_available_letters(tiles.to_vec()).await.unwrap_or_default();
+    Ok(Game { 
+        selected_letter: '_',
+        game_key: get_game_key(), 
+        starting_word: word, 
+        starting_tiles: tiles.to_vec(), 
+        starting_letters: avail_letters.clone(), 
+        available_letters: avail_letters, 
+        current_tiles: tiles.to_vec() 
+    })
 }
 
 fn get_game_key() -> i64 {
@@ -123,6 +141,39 @@ pub fn GameHeader() -> impl IntoView {
 
     view! { <div class="text-4xl">"Challenge #" {move || game.get().game_key}</div> }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,7 +1,7 @@
-use leptos::{*, logging::log, svg::view};
+use leptos::{logging::log, svg::view, *};
 use serde::{Deserialize, Serialize};
 
-use crate::components::word::get_available_letters;
+use crate::components::game::{use_game, Game};
 
 use super::session::Session;
 
@@ -32,6 +32,15 @@ pub struct Tile {
     pub author: TileAuthor,
 }
 
+impl Default for Tile {
+    fn default() -> Self {
+        Tile {
+            letter: 'c',
+            author: TileAuthor::Computer,
+        }
+    }
+}
+
 impl PartialEq for Tile {
     fn eq(&self, other: &Self) -> bool {
         self.letter == other.letter
@@ -39,37 +48,34 @@ impl PartialEq for Tile {
 }
 
 pub fn convert_tiles_to_word(tiles: Vec<Tile>) -> String {
-    tiles.into_iter().map(|t| t.letter).collect()
+    tiles
+        .into_iter()
+        .map(|t| t.letter.to_lowercase().to_string())
+        .collect()
 }
 
 #[component]
 pub fn Tiles(session: Signal<Session>) -> impl IntoView {
-    let get_available_letter = create_local_resource(
-        move || session().starting_tiles.to_vec(), 
-        move |tiles| async move {get_available_letters(tiles.to_vec()).await}
-    );
+    let (game, _) = use_game();
 
     let (tile_type, set_tile_type) = create_signal(TileKind::TileEmpty);
+
     create_effect(move |_| {
-        get_available_letter.and_then(|avail_letts| {
-            set_tile_type.set(
-                if session().selected_letter == '_' {TileKind::TileEmpty}
-                else {
-                    match avail_letts.contains(&session().selected_letter) {
-                        true => TileKind::TileOkay,
-                        false => TileKind::TileNotOkay,
-                    }
-                }
-            )
-        });
+        set_tile_type.set(if game().selected_letter == '_' {
+            TileKind::TileEmpty
+        } else {
+            match game().available_letters.contains(&game().selected_letter) {
+                true => TileKind::TileOkay,
+                false => TileKind::TileNotOkay,
+            }
+        })
     });
 
     // current tile
 
     let tiles = move || {
-        session
-            .get()
-            .starting_tiles
+        game.get()
+            .current_tiles
             .into_iter()
             .map(|n| {
                 view! {
@@ -86,10 +92,10 @@ pub fn Tiles(session: Signal<Session>) -> impl IntoView {
     };
 
     let enter_tile_view = move || match tile_type.get() {
-            TileKind::TileOkay => view! { <OkayTile session/> },
-            TileKind::TileEmpty => view! { <EmptyTile session/> },
-            TileKind::TileNotOkay => view! { <NotOkayTile session/> },
-            _ => view! { <EmptyTile session/> },
+        TileKind::TileOkay => view! { <OkayTile game/> },
+        TileKind::TileEmpty => view! { <EmptyTile game/> },
+        TileKind::TileNotOkay => view! { <NotOkayTile game/> },
+        _ => view! { <EmptyTile game/> },
     };
 
     view! {
@@ -102,85 +108,29 @@ pub fn Tiles(session: Signal<Session>) -> impl IntoView {
 }
 
 #[component]
-fn EmptyTile(
-    session: Signal<Session>
-) -> impl IntoView {
+fn EmptyTile(game: Signal<Game>) -> impl IntoView {
     view! {
         <li class="w-16 h-20 border-2 border-gray-300 rounded-lg flex justify-center items-center text-gray-300">
-            {move || session.get().selected_letter}
+            {move || game.get().selected_letter}
         </li>
     }
 }
 
 #[component]
-fn NotOkayTile(
-    session: Signal<Session>
-) -> impl IntoView {
+fn NotOkayTile(game: Signal<Game>) -> impl IntoView {
     view! {
         <li class="w-16 h-20 border-2 border-red-600 rounded-lg flex justify-center items-center text-red-600">
-            {move || session.get().selected_letter}
+            {move || game.get().selected_letter}
         </li>
     }
 }
 
 #[component]
-fn OkayTile(
-    session: Signal<Session>
-) -> impl IntoView {
+fn OkayTile(game: Signal<Game>) -> impl IntoView {
     view! {
         <li class="w-16 h-20 border-2 border-green-600 rounded-lg flex justify-center items-center text-green-600">
-            {move || session.get().selected_letter}
+            {move || game.get().selected_letter}
         </li>
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
