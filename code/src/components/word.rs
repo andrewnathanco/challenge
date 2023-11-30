@@ -33,9 +33,9 @@ pub async fn get_words() -> Result<Vec<String>> {
     Ok(["computer".to_string()].to_vec())
 }
 
-pub async fn get_word() -> Result<String> { 
+pub async fn get_word(game_key: i64) -> Result<String> { 
     let avail_words = get_words().await?;
-    Ok(avail_words[0].to_string())
+    Ok(avail_words[game_key as usize + 1].to_string())
 }
 
 
@@ -55,4 +55,10 @@ pub async fn get_available_letters(
 
     Ok(letters.into_iter().collect())
 }
+
+
+
+
+
+
 

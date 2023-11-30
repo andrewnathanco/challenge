@@ -86,7 +86,7 @@ pub fn use_game(
 }
 
 pub async fn get_new_game() -> Result<Game> {
-    let word = get_word().await.unwrap_or_default();
+    let word = get_word(get_game_key()).await.unwrap_or_default();
     let mut rng = rand::thread_rng();
     let num_chars = rng.gen_range(0..3);
     let mut tiles: Vec<Tile> = Vec::new();
@@ -109,10 +109,6 @@ pub async fn get_new_game() -> Result<Game> {
             letter: word.chars().nth(1).unwrap_or_default(),
             author: TileAuthor::Computer,
         },
-        Tile{
-            letter: word.chars().nth(2).unwrap_or_default(),
-            author: TileAuthor::Computer,
-        },
     ];
 
     let avail_letters = get_available_letters(tiles.to_vec()).await.unwrap_or_default();
@@ -129,7 +125,7 @@ pub async fn get_new_game() -> Result<Game> {
 
 fn get_game_key() -> i64 {
     let now= Utc::now();
-    let specific_date= Utc.with_ymd_and_hms(2023, 11, 26, 5, 0, 0).unwrap();
+    let specific_date= Utc.with_ymd_and_hms(2023, 11, 28, 5, 0, 0).unwrap();
     let duration = now.signed_duration_since(specific_date);
 
     duration.num_days()
@@ -141,6 +137,16 @@ pub fn GameHeader() -> impl IntoView {
 
     view! { <div class="text-4xl">"Challenge #" {move || game.get().game_key}</div> }
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
