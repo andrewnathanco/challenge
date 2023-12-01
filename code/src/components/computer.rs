@@ -1,7 +1,7 @@
 use core::fmt;
 use std::{error::Error, io::ErrorKind};
 
-use super::{keyboard::get_all_letters, tile::*, word::get_words};
+use super::{tile::*, word::get_words};
 use leptos::{*,error::Result, logging::log};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
@@ -50,7 +50,7 @@ pub async fn get_tile_from_computer(
         })
     } else {
         Ok(Tile{
-            letter: 'x',
+            letter: '?',
             author: TileAuthor::Computer,
         })
     }
@@ -59,6 +59,10 @@ pub async fn get_tile_from_computer(
 pub async fn get_word_for_computer() -> Result<String> {
     Ok("test".to_string())
 }
+
+
+
+
 
 
 

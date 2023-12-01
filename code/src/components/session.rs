@@ -7,43 +7,45 @@ use serde::{Deserialize, Serialize};
 use crate::components::{game::*, keyboard::Keyboard, tile::*};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct Session {}
+pub enum SessionStatus {
+    UserWon,
+    ComputerWon,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct Session {
+    pub status: SessionStatus,
+    pub tiles: Vec<Tile>,
+}
 
 impl Default for Session {
     fn default() -> Self {
-        Session {}
+        Session {
+            status: SessionStatus::ComputerWon,
+            tiles: Vec::new(),
+        }
     }
 }
 
 #[component]
-pub fn SessionView() -> impl IntoView {
+pub fn SessionView(
+    game_info_dialog_status: ReadSignal<bool>,
+    set_game_info_dialog_status: WriteSignal<bool>,
+) -> impl IntoView {
     // create the initial session
-    let (session, _, _) = use_local_storage("session", Session::default());
     let (game, set_game) = use_game();
-
-    let reset_game = move |_| {
-        let starting_tiles = game().starting_tiles;
-        let starting_letters = game().starting_letters;
-
-        set_game.update(|g| {
-            g.selected_letter = '_';
-            g.current_tiles = starting_tiles;
-            g.available_letters = starting_letters;
-        });
-    };
 
     view! {
         <div class="flex flex-col space-y-2 h-full w-full">
-            <Tiles session=session/>
-            <Keyboard/>
+            <Tiles game_over=false winner=TileAuthor::User/>
+            <Keyboard game_info_dialog_status set_game_info_dialog_status/>
 
             <div class="flex flex-col space-y-2">
                 <button
-                    on:click=reset_game
-
+                    on:click=move |_| set_game_info_dialog_status(true)
                     class="border-2 border-gray-500 rounded-lg w-full p-2 text-gray-700"
                 >
-                    "Reset Game"
+                    "Game Info"
                 </button>
             </div>
         </div>

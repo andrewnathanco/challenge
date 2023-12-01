@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use leptos::{error::Result, *, logging::log};
 use csv::ReaderBuilder;
 
-use super::{tile::{Tile, convert_tiles_to_word}, keyboard::get_all_letters};
+use super::{tile::{Tile, convert_tiles_to_word}};
 
 pub async fn get_words() -> Result<Vec<String>> {
     // make the request
@@ -44,7 +44,6 @@ pub async fn get_available_letters(
 ) -> Result<Vec<char>> {
     let mut letters :HashSet<char>=  HashSet::new();
     let curr_word = convert_tiles_to_word(tiles);
-    log!("Current Word: {:?}", curr_word);
     let len_curr_word = curr_word.len();
     for word in get_words().await.unwrap() {
         if word.starts_with(&curr_word) {
@@ -55,6 +54,11 @@ pub async fn get_available_letters(
 
     Ok(letters.into_iter().collect())
 }
+
+pub async fn are_tiles_word(tiles: Vec<Tile>) -> Result<bool> {
+    Ok(tiles.len() >3)
+}
+
 
 
 

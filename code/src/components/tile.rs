@@ -5,11 +5,9 @@ use crate::components::game::{use_game, Game};
 
 use super::session::Session;
 
-pub const TILE_COMP: &str =
-    "w-16 h-20 bg-gray-300 rounded-lg  flex justify-center items-center border-2 border-gray-400";
+pub const TILE_COMP: &str = "";
 
-pub const TILE_YOU: &str =
-    "w-16 h-20 bg-green-300 border-2 border-green-500 rounded-lg flex justify-center items-center";
+pub const TILE_YOU: &str = "";
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 enum TileKind {
@@ -55,7 +53,7 @@ pub fn convert_tiles_to_word(tiles: Vec<Tile>) -> String {
 }
 
 #[component]
-pub fn Tiles(session: Signal<Session>) -> impl IntoView {
+pub fn Tiles(game_over: bool, winner: TileAuthor) -> impl IntoView {
     let (game, _) = use_game();
 
     let (tile_type, set_tile_type) = create_signal(TileKind::TileEmpty);
@@ -77,25 +75,27 @@ pub fn Tiles(session: Signal<Session>) -> impl IntoView {
         game.get()
             .current_tiles
             .into_iter()
-            .map(|n| {
-                view! {
-                    <li class=match n.author {
-                        TileAuthor::Computer => TILE_COMP,
-                        TileAuthor::User => TILE_YOU,
-                    }>
-
-                        {n.letter}
-                    </li>
-                }
+            .map(move |tile| match game_over {
+                true => match winner {
+                    TileAuthor::Computer => view! { <LostTile letter=tile.letter/> },
+                    TileAuthor::User => view! { <YouTile letter=tile.letter/> },
+                },
+                false => match tile.author {
+                    TileAuthor::Computer => view! { <ComputerTile letter=tile.letter/> },
+                    TileAuthor::User => view! { <YouTile letter=tile.letter/> },
+                },
             })
             .collect::<Vec<_>>()
     };
 
-    let enter_tile_view = move || match tile_type.get() {
-        TileKind::TileOkay => view! { <OkayTile game/> },
-        TileKind::TileEmpty => view! { <EmptyTile game/> },
-        TileKind::TileNotOkay => view! { <NotOkayTile game/> },
-        _ => view! { <EmptyTile game/> },
+    let enter_tile_view = move || match game_over {
+        true => view! { <div></div> }.into_view(),
+        false => match tile_type.get() {
+            TileKind::TileOkay => view! { <OkayTile letter=game().selected_letter/> },
+            TileKind::TileEmpty => view! { <EmptyTile letter=game().selected_letter/> },
+            TileKind::TileNotOkay => view! { <NotOkayTile letter=game().selected_letter/> },
+            _ => view! { <EmptyTile letter=game().selected_letter/> },
+        },
     };
 
     view! {
@@ -108,28 +108,55 @@ pub fn Tiles(session: Signal<Session>) -> impl IntoView {
 }
 
 #[component]
-fn EmptyTile(game: Signal<Game>) -> impl IntoView {
+fn EmptyTile(letter: char) -> impl IntoView {
     view! {
         <li class="w-16 h-20 border-2 border-gray-300 rounded-lg flex justify-center items-center text-gray-300">
-            {move || game.get().selected_letter}
+            {letter}
         </li>
     }
 }
 
 #[component]
-fn NotOkayTile(game: Signal<Game>) -> impl IntoView {
+fn NotOkayTile(letter: char) -> impl IntoView {
     view! {
         <li class="w-16 h-20 border-2 border-red-600 rounded-lg flex justify-center items-center text-red-600">
-            {move || game.get().selected_letter}
+            {letter}
         </li>
     }
 }
 
 #[component]
-fn OkayTile(game: Signal<Game>) -> impl IntoView {
+fn OkayTile(letter: char) -> impl IntoView {
     view! {
         <li class="w-16 h-20 border-2 border-green-600 rounded-lg flex justify-center items-center text-green-600">
-            {move || game.get().selected_letter}
+            {letter}
+        </li>
+    }
+}
+
+#[component]
+fn YouTile(letter: char) -> impl IntoView {
+    view! {
+        <li class="w-16 h-20 bg-green-300 border-2 border-green-500 rounded-lg flex justify-center items-center">
+            {letter}
+        </li>
+    }
+}
+
+#[component]
+fn ComputerTile(letter: char) -> impl IntoView {
+    view! {
+        <li class="w-16 h-20 bg-gray-300 rounded-lg  flex justify-center items-center border-2 border-gray-400">
+            {letter}
+        </li>
+    }
+}
+
+#[component]
+fn LostTile(letter: char) -> impl IntoView {
+    view! {
+        <li class="w-16 h-20 bg-red-300 border-2 border-red-500 rounded-lg flex justify-center items-center">
+            {letter}
         </li>
     }
 }

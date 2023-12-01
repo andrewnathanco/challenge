@@ -1,11 +1,14 @@
+use core::time;
+use std::thread;
+
 use crate::components::game::use_game;
+use crate::components::game_info_dialog::GameInfoDialog;
 use crate::components::tile::{Tile, TileAuthor};
-use crate::components::word::get_available_letters;
+use crate::components::word::{get_available_letters, are_tiles_word};
 use leptos::leptos_dom::helpers::window_event_listener;
 use leptos::{*, logging::log};
 
 use super::computer::get_tile_from_computer;
-use super::session::Session;
 use super::game::Game;
 
 
@@ -13,33 +16,26 @@ const TOP: [&str; 10] = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"];
 const MIDDLE: [&str; 9] = ["A", "S", "D", "F", "G", "H", "J", "K", "L"];
 const BOTTOM: [&str; 7] = ["Z", "X", "C", "V", "B", "N", "M"];
 
-pub fn get_all_letters() -> Vec<String> {
-    let mut all_letters: Vec<String> = Vec::new();
-
-    // Add letters from TOP array
-    for &letter in TOP.iter() {
-        all_letters.push(letter.to_string());
-    }
-
-    // Add letters from MIDDLE array
-    for &letter in MIDDLE.iter() {
-        all_letters.push(letter.to_string());
-    }
-
-    // Add letters from BOTTOM array
-    for &letter in BOTTOM.iter() {
-        all_letters.push(letter.to_string());
-    }
-
-    all_letters
-}
 
 #[component]
 pub fn Keyboard(
+    game_info_dialog_status: ReadSignal<bool>,
+    set_game_info_dialog_status: WriteSignal<bool>,
 ) -> impl IntoView {
     let (game, set_game) = use_game();
 
+    let check_valid_word = create_local_resource(move || game().current_tiles, |tiles| async move {
+        are_tiles_word(tiles.clone()).await
+    });
 
+    // check to see if the current tiles are a word
+    create_effect(move |_| {
+        check_valid_word.and_then(|is_word| {
+            set_game_info_dialog_status(is_word.clone())
+        })
+    });
+
+    // define actions
     let set_tile_from_comp = 
         create_action(move |tiles: &Vec<Tile>| {
             let new_tiles = tiles.clone();
@@ -200,6 +196,10 @@ pub fn Keyboard(
                 </button>
             </div>
         </div>
+        <GameInfoDialog
+            is_open=game_info_dialog_status
+            set_dialog_status=set_game_info_dialog_status
+        />
     }
 }
 
@@ -219,185 +219,4 @@ pub fn Key(letter: String, set_game: WriteSignal<Game>) -> impl IntoView {
         </button>
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
