@@ -3,6 +3,7 @@ use std::thread;
 
 use crate::components::game::use_game;
 use crate::components::game_info_dialog::GameInfoDialog;
+use crate::components::session::{use_session, SessionStatus};
 use crate::components::tile::{Tile, TileAuthor};
 use crate::components::word::{get_available_letters, are_tiles_word};
 use leptos::leptos_dom::helpers::window_event_listener;
@@ -22,6 +23,7 @@ pub fn Keyboard(
     game_info_dialog_status: ReadSignal<bool>,
     set_game_info_dialog_status: WriteSignal<bool>,
 ) -> impl IntoView {
+    let (_, set_session) = use_session();
     let (game, set_game) = use_game();
 
     let check_valid_word = create_local_resource(move || game().current_tiles, |tiles| async move {
@@ -31,6 +33,16 @@ pub fn Keyboard(
     // check to see if the current tiles are a word
     create_effect(move |_| {
         check_valid_word.and_then(|is_word| {
+            log!("{:?}", is_word);
+            if *is_word {
+                    set_session.update(|sess| {
+                    sess.status = match game().current_tiles.last().unwrap().author {
+                        TileAuthor::Computer => SessionStatus::UserWon,
+                        TileAuthor::User => SessionStatus::ComputerWon,
+                    };
+                    sess.tiles = game().current_tiles;
+                });
+            }
             set_game_info_dialog_status(is_word.clone())
         })
     });
@@ -208,15 +220,24 @@ pub fn Key(letter: String, set_game: WriteSignal<Game>) -> impl IntoView {
     // needed because we are doing some cloning
     let lett = letter.clone();
     view! {
-        <button
-            on:click=move |_| {
-                set_game.update(|g| g.selected_letter = lett.chars().nth(0).unwrap_or_default())
-            }
+        <button // on:click=move |_| {
+        // set_game.update(|g| g.selected_letter = lett.chars().nth(0).unwrap_or_default())
+        // }
 
-            class="w-8 h-16 bg-gray-300 rounded-lg cursor-pointer"
-        >
-            {letter}
-        </button>
+        class="w-8 h-16 bg-gray-300 rounded-lg cursor-pointer">{letter}</button>
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 

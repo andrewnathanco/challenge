@@ -135,7 +135,7 @@ pub async fn get_new_game() -> Result<Game> {
 
 fn get_game_key() -> i64 {
     let now= Utc::now();
-    let specific_date= Utc.with_ymd_and_hms(2023, 11, 27, 5, 0, 0).unwrap();
+    let specific_date= Utc.with_ymd_and_hms(2023, 11, 26, 5, 0, 0).unwrap();
     let duration = now.signed_duration_since(specific_date);
 
     duration.num_days()
@@ -144,7 +144,6 @@ fn get_game_key() -> i64 {
 pub fn get_countdown_till_next_game() -> String {
     // Get the current local time
     let now = Utc::now();
-    log!("{:?}", now);
 
     // midnight EST in UTC
     let midnight = Utc.with_ymd_and_hms(now.year(), now.month(), now.day(), 5, 0, 0).unwrap();
@@ -168,11 +167,15 @@ pub fn GameHeader() -> impl IntoView {
                 id="game-version"
                 class="font-semibold w-min h-min text-gray-600 text-xs border-2 px-1 border-gray-600 rounded-lg"
             >
-                {version}
+                {move || version}
             </div>
         </div>
     }
 }
+
+
+
+
 
 
 

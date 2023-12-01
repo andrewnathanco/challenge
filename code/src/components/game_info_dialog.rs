@@ -1,10 +1,9 @@
-use std::time::SystemTime;
-
 use leptos::*;
 use leptos_use::use_interval_fn;
 
 use crate::components::game::{get_countdown_till_next_game, use_game};
-use crate::components::tile::{TileAuthor, Tiles};
+use crate::components::session::{use_session, Session, SessionStatus};
+use crate::components::tile::Tiles;
 
 #[component]
 pub fn GameInfoDialog(
@@ -13,6 +12,7 @@ pub fn GameInfoDialog(
 ) -> impl IntoView {
     let (current_time, set_current_time) = create_signal(get_countdown_till_next_game());
     let (game, set_game) = use_game();
+    let (session, set_session) = use_session();
 
     // setup interval for
     use_interval_fn(
@@ -39,7 +39,20 @@ pub fn GameInfoDialog(
             g.current_tiles = starting_tiles;
             g.available_letters = starting_letters;
         });
+
         set_dialog_status(false);
+        set_session(Session::default());
+    };
+
+    let tiles = move || match session().status {
+        SessionStatus::Current => view! { <div></div> }.into_view(),
+        _ => view! { <Tiles tiles=session().tiles.clone() read_only=true/> },
+    };
+
+    let title = move || match session().status {
+        SessionStatus::ComputerWon => "Computer Won",
+        SessionStatus::UserWon => "You Won",
+        _ => "Game Stats",
     };
 
     view! {
@@ -51,7 +64,7 @@ pub fn GameInfoDialog(
                         id="dialog-header"
                         class="flex justify-between items-center text-3xl w-full"
                     >
-                        <div>"Computer Wins"</div>
+                        <div>{title}</div>
                         <button on:click=move |_| { set_dialog_status(false) }>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -67,14 +80,11 @@ pub fn GameInfoDialog(
                             </svg>
                         </button>
                     </div>
-                    <div class="flex-1">
-                        // use the current session for this
-                        <Tiles game_over=true winner=TileAuthor::Computer/>
-                    </div>
+                    <div class="flex-1 flex flex-col justify-center items-center">{tiles}</div>
                     <div class="flex flex-col space-y-2">
                         <div id="timer" class="flex flex-col space-y-1 items-center">
                             <div id="time" class="text-3xl">
-                                {current_time}
+                                {move || current_time}
                             </div>
                             <div id="text" class="text-2xl">
                                 "Next Challenge"

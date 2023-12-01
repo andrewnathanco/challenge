@@ -56,8 +56,17 @@ pub async fn get_available_letters(
 }
 
 pub async fn are_tiles_word(tiles: Vec<Tile>) -> Result<bool> {
-    Ok(tiles.len() >3)
+    let word = convert_tiles_to_word(tiles);
+    log!("{:?}", word);
+    let lower_word = word.to_lowercase();
+    let words = get_words().await.unwrap();
+    Ok(words.contains(&lower_word))
 }
+
+
+
+
+
 
 
 
