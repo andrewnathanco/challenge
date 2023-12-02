@@ -1,29 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link data-trunk rel="rust" data-wasm-opt="z" />
-    <link data-trunk rel="copy-file" href="/data/valid_words.csv" />
-    <link data-trunk rel="icon" href="/favicon.ico" />
-    <link data-trunk rel="css" href="/style/output.css" />
-    <link href="/valid_words.csv" />
-
-    <meta name="author" content="Andrew Nathan" />
-    <meta name="title" content="Challenge" />
-    <meta
-      name="description"
-      content="Challenge is a daily word puzzle where you have to beat the computer."
-    />
-    <meta
-      name="keywords"
-      content="challenge, mural, wordle, nytimesgames, nytimes, puzzle, daily, game, puzzles, games, worldle, globle, words"
-    />
-    <meta name="robots" content="index, follow" />
-
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="language" content="English" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Challenge</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="shortcut icon" type="image/ico" href="/src/assets/favicon.ico" />
+    <title>Solid App</title>
   </head>
-  <body class="h-full"></body>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div class="h-full" id="root"></div>
+
+    <script src="/src/index.tsx" type="module"></script>
+  </body>
 </html>
