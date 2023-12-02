@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite';
-import solidPlugin from 'vite-plugin-solid';
-// import devtools from 'solid-devtools/vite';
+import { defineConfig } from "vite";
+import solidPlugin from "vite-plugin-solid";
+import basicSsl from "@vitejs/plugin-basic-ssl";
 
 export default defineConfig({
   plugins: [
@@ -10,11 +10,12 @@ export default defineConfig({
     */
     // devtools(),
     solidPlugin(),
+    basicSsl(),
   ],
   server: {
     port: 3000,
   },
   build: {
-    target: 'esnext',
+    target: "esnext",
   },
 });

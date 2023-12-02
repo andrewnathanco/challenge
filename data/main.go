@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"log"
 	"log/slog"
@@ -39,6 +40,22 @@ func readCsvFile(filePath string) ([][]string, error) {
 	})
 
 	return filtered, nil
+}
+
+func exportToJSON(data interface{}, filename string) {
+	file, err := os.Create(filename)
+	if err != nil {
+		must(err)
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+
+	// Encode data and write to file
+	err = encoder.Encode(data)
+	if err != nil {
+		must(err)
+	}
 }
 
 func exportToCSV(data []string, filename string) {
@@ -151,7 +168,8 @@ func getAnswerSet() []string {
 
 func main() {
 	answers := getAnswerSet()
-	exportToCSV(answers, "./data/challenge_dict.csv")
+	exportToJSON(answers, "./data/valid_words.json")
+	exportToCSV(answers, "./data/valid_words.csv")
 
 	game_active := true
 	curr_word := ""
