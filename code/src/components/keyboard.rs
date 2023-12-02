@@ -1,13 +1,10 @@
-use core::time;
-use std::thread;
-
 use crate::components::game::use_game;
 use crate::components::game_info_dialog::GameInfoDialog;
 use crate::components::session::{use_session, SessionStatus};
 use crate::components::tile::{Tile, TileAuthor};
 use crate::components::word::{get_available_letters, are_tiles_word};
 use leptos::leptos_dom::helpers::window_event_listener;
-use leptos::{*, logging::log};
+use leptos::*;
 
 use super::computer::get_tile_from_computer;
 use super::game::Game;
@@ -22,8 +19,9 @@ const BOTTOM: [&str; 7] = ["Z", "X", "C", "V", "B", "N", "M"];
 pub fn Keyboard(
     game_info_dialog_status: ReadSignal<bool>,
     set_game_info_dialog_status: WriteSignal<bool>,
+    read_only: bool,
 ) -> impl IntoView {
-    let (_, set_session) = use_session();
+    let (session, set_session) = use_session();
     let (game, set_game) = use_game();
 
     let check_valid_word = create_local_resource(move || game().current_tiles, |tiles| async move {
@@ -32,8 +30,8 @@ pub fn Keyboard(
 
     // check to see if the current tiles are a word
     create_effect(move |_| {
+        if !read_only {
         check_valid_word.and_then(|is_word| {
-            log!("{:?}", is_word);
             if *is_word {
                     set_session.update(|sess| {
                     sess.status = match game().current_tiles.last().unwrap().author {
@@ -43,8 +41,13 @@ pub fn Keyboard(
                     sess.tiles = game().current_tiles;
                 });
             }
-            set_game_info_dialog_status(is_word.clone())
-        })
+
+            set_game_info_dialog_status(is_word.clone());
+            set_game.update(move |g| {
+                g.sessions.push(session())
+            })
+        });
+        }
     });
 
     // define actions
@@ -53,13 +56,16 @@ pub fn Keyboard(
             let new_tiles = tiles.clone();
             let mut new_game = game();
             async move {
-                let tile = get_tile_from_computer(new_tiles.clone()).await.unwrap();
-                new_game.current_tiles.push(tile);
-                let avail_lett = get_available_letters(new_game.current_tiles.clone()).await.unwrap();
-                new_game.available_letters = avail_lett;
-                set_game.set(new_game)
+                if !are_tiles_word(new_tiles.clone()).await.unwrap() {
+                    let tiles = get_tile_from_computer(new_tiles.clone()).await.unwrap();
+                    new_game.current_tiles.append(&mut tiles.clone());
+                    let avail_lett = get_available_letters(new_game.current_tiles.clone()).await.unwrap();
+                    new_game.available_letters = avail_lett;
+                    set_game.set(new_game)
+                }
             }
-    });
+        })
+    ;
 
     let set_available_letters = 
         create_action(move |tiles: &Vec<Tile>| {
@@ -74,6 +80,10 @@ pub fn Keyboard(
 
     // this grabs the letter from the user, resets the selected and adds the letter as a tile
     let lock_in_letter = move || {
+        if read_only {
+            return
+        }
+
         let selected_letter = game().selected_letter;
         if game().selected_letter != '_' {
             // update the selected letter
@@ -89,6 +99,10 @@ pub fn Keyboard(
     };
 
     let submit_letter = move |valid_letter: bool| {
+        if read_only {
+            return
+        }
+
         if valid_letter {
             if game().selected_letter != '_' {
                 // lock in letter from the user
@@ -107,6 +121,11 @@ pub fn Keyboard(
             });
             return
         }
+
+        if read_only {
+            return
+        }
+
         let curr_tiles = game().current_tiles.clone();
         let len_curr = game().current_tiles.len();
         let len_starting = game().starting_tiles.len();
@@ -126,25 +145,29 @@ pub fn Keyboard(
 
     let top_keys = move || {
         TOP.map(|k| {
-            view! { <Key letter={ k }.to_string() set_game=set_game/> }
+            view! { <Key letter={ k }.to_string() set_game=set_game read_only/> }
         })
     };
 
     let middle_keys = move || {
         MIDDLE.map(|k| {
-            view! { <Key letter={ k }.to_string() set_game=set_game/> }
+            view! { <Key letter={ k }.to_string() set_game=set_game read_only/> }
         })
     };
 
     let bottom_keys = move || {
         BOTTOM.map(|k| {
-            view! { <Key letter={ k }.to_string() set_game=set_game/> }
+            view! { <Key letter={ k }.to_string() set_game=set_game read_only/> }
         })
     };
 
     // this makes sure that users can use their keyboard instead of the on-screen one
     let handle_keyboard = window_event_listener(ev::keydown, move |ev| {
         ev.prevent_default();
+        if read_only {
+            return
+        }
+
         let code = ev.code();
         if code.starts_with("Key") {
             let key = code.strip_prefix("Key").unwrap();
@@ -216,17 +239,30 @@ pub fn Keyboard(
 }
 
 #[component]
-pub fn Key(letter: String, set_game: WriteSignal<Game>) -> impl IntoView {
+pub fn Key(
+    letter: String, 
+    set_game: WriteSignal<Game>,
+    read_only: bool,
+) -> impl IntoView {
     // needed because we are doing some cloning
     let lett = letter.clone();
     view! {
-        <button // on:click=move |_| {
-        // set_game.update(|g| g.selected_letter = lett.chars().nth(0).unwrap_or_default())
-        // }
+        <button
+            on:click=move |_| {
+                if !read_only {
+                    set_game.update(|g| g.selected_letter = lett.chars().nth(0).unwrap_or_default())
+                }
+            }
 
-        class="w-8 h-16 bg-gray-300 rounded-lg cursor-pointer">{letter}</button>
+            class="w-8 h-16 bg-gray-300 rounded-lg cursor-pointer"
+        >
+            {letter}
+        </button>
     }
 }
+
+
+
 
 
 

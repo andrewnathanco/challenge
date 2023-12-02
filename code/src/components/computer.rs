@@ -1,12 +1,9 @@
 use core::fmt;
-use std::{error::Error, io::ErrorKind};
+use std::error::Error;
 
 use super::{tile::*, word::get_words};
-use leptos::{*,error::Result, logging::log};
+use leptos::{error::Result, logging::log};
 use rand::Rng;
-use serde::{Deserialize, Serialize};
-
-use crate::components::word::get_word;
 
 
 #[derive(Debug)]
@@ -23,7 +20,7 @@ impl fmt::Display for IgnoreTileError {
 
 pub async fn get_tile_from_computer(
     tiles: Vec<Tile>,
-) -> Result<Tile> {
+) -> Result<Vec<Tile>> {
     // get all possible answers
     let words = get_words().await.unwrap_or_default();
 
@@ -37,146 +34,40 @@ pub async fn get_tile_from_computer(
         word.starts_with(curr_str)
     }).collect();
 
-    let mut rng = rand::thread_rng();
-    let len_probable = possible_answers.len();
-    if len_probable > 0 {
-        let index = rng.gen_range(0..len_probable);
-        let comp_word = possible_answers.get(index).unwrap();
-        let comp_letter = comp_word.chars().nth(len_curr_str).unwrap_or_default();
+    let possible_answers_where_the_computer_wins: Vec<String> = possible_answers.clone().into_iter().filter(|word| {
+        let len_word = word.len();
+        len_curr_str % 2 == len_word % 2
+    }).collect();
 
-        Ok(Tile{
+    let mut rng = rand::thread_rng();
+    let len_possible_wins = possible_answers_where_the_computer_wins.len();
+    let len_all_possible = possible_answers.len();
+    log!("all possible: {:?}", possible_answers);
+    log!("all wins: {:?}", possible_answers_where_the_computer_wins);
+    if len_possible_wins > 0 {
+        let index = rng.gen_range(0..len_possible_wins);
+        let comp_word = possible_answers_where_the_computer_wins.get(index).unwrap();
+        let comp_letter = comp_word.chars().nth(len_curr_str).unwrap_or_default();
+        Ok(vec![Tile{
             letter: comp_letter,
             author: TileAuthor::Computer,
-        })
+        }])
     } else {
-        Ok(Tile{
+        if len_all_possible > 0 {
+            let index = rng.gen_range(0..len_all_possible);
+            let comp_word = possible_answers.get(index).unwrap();
+            let comp_letter = comp_word.chars().nth(len_curr_str).unwrap_or_default();
+
+            return Ok(vec![Tile{
+                letter: comp_letter,
+                author: TileAuthor::Computer,
+            }])
+        }
+
+        Ok(vec![Tile{
             letter: '?',
             author: TileAuthor::Computer,
-        })
+        }])
     }
 }
-
-pub async fn get_word_for_computer() -> Result<String> {
-    Ok("test".to_string())
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -1,9 +1,8 @@
-use leptos::*;
-use leptos_use::use_interval_fn;
-
 use crate::components::game::{get_countdown_till_next_game, use_game};
 use crate::components::session::{use_session, Session, SessionStatus};
 use crate::components::tile::Tiles;
+use leptos::{logging::log, *};
+use leptos_use::use_interval_fn;
 
 #[component]
 pub fn GameInfoDialog(
@@ -30,7 +29,7 @@ pub fn GameInfoDialog(
             }
         };
 
-    let reset_game = move |_| {
+    let reset_game = move || {
         let starting_tiles = game().starting_tiles;
         let starting_letters = game().starting_letters;
 
@@ -91,7 +90,8 @@ pub fn GameInfoDialog(
                             </div>
                         </div>
                         <button
-                            on:click=reset_game
+                            on:click=move |_| { reset_game() }
+
                             class="border-2 border-gray-300 rounded-lg w-full p-2 text-gray-700 bg-gray-300 flex items-center justify-center space-x-2"
                         >
                             <svg
@@ -110,9 +110,7 @@ pub fn GameInfoDialog(
                             <div>"Try Again"</div>
                         </button>
                         <button
-                            on:click=move |_| {
-                                set_dialog_status(true);
-                            }
+                            on:click=move |_| {}
 
                             class="border-2 border-green-400 rounded-lg w-full p-2 text-gray-700 bg-green-400 flex items-center justify-center space-x-2"
                         >

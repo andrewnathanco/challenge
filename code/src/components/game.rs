@@ -1,6 +1,6 @@
 use super::{tile::*, word::get_available_letters, session::Session};
 use chrono::prelude::*;
-use leptos::{*,error::Result, logging::log};
+use leptos::{*, error::Result};
 use leptos_use::storage::use_local_storage;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
@@ -172,6 +172,8 @@ pub fn GameHeader() -> impl IntoView {
         </div>
     }
 }
+
+
 
 
 

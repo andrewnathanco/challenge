@@ -1,9 +1,8 @@
 use std::collections::HashSet;
 
-use leptos::{error::Result, *, logging::log};
+use leptos::error::Result;
 use csv::ReaderBuilder;
-
-use super::{tile::{Tile, convert_tiles_to_word}};
+use super::tile::{Tile, convert_tiles_to_word};
 
 pub async fn get_words() -> Result<Vec<String>> {
     // make the request
@@ -57,11 +56,16 @@ pub async fn get_available_letters(
 
 pub async fn are_tiles_word(tiles: Vec<Tile>) -> Result<bool> {
     let word = convert_tiles_to_word(tiles);
-    log!("{:?}", word);
     let lower_word = word.to_lowercase();
     let words = get_words().await.unwrap();
     Ok(words.contains(&lower_word))
 }
+
+
+
+
+
+
 
 
 

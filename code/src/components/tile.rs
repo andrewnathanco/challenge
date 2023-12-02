@@ -1,17 +1,8 @@
-use leptos::{logging::log, svg::view, *};
-use leptos_use::storage::use_local_storage;
+use leptos::*;
 use serde::{Deserialize, Serialize};
 
-use crate::components::{
-    game::{use_game, Game},
-    session::use_session,
-};
-
-use super::session::{Session, SessionStatus};
-
-pub const TILE_COMP: &str = "";
-
-pub const TILE_YOU: &str = "";
+use super::session::SessionStatus;
+use crate::components::{game::use_game, session::use_session};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 enum TileKind {
