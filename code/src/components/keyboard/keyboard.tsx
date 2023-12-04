@@ -152,14 +152,14 @@ function Keyboard() {
       </div>
       <div id="bottom-row" class="flex flex-row space-between space-x-1">
         <button
-          class="p-1 h-16 bg-green-300 rounded-lg cursor-pointer items-center justify-center flex"
+          class="border-2 p-1 h-16 bg-green-300 border-green-400 rounded-lg cursor-pointer items-center justify-center flex"
           onclick={submit_letter}
         >
           ENTER
         </button>
         <BottomKeys />
         <button
-          class="w-12 h-16 bg-red-300 rounded-lg cursor-pointer justify-center items-center flex"
+          class="border-2 w-12 h-16 bg-red-300 border-red-400 rounded-lg cursor-pointer justify-center items-center flex"
           onclick={remove_letter}
         >
           <svg

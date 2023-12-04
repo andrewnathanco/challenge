@@ -2,7 +2,7 @@ import { createEffect, createSignal } from "solid-js";
 import { useGame } from "../game/context";
 import { get_countdown_till_next_game, get_todays_game } from "../game/service";
 import { useGameInfoDialog } from "./context";
-import { get_default_session } from "../session/service";
+import { get_default_session, get_share } from "../session/service";
 import { useSession } from "../session/context";
 import { SessionStatus } from "../session/model";
 import { Tiles, invert_tile_author } from "../tiles/tiles";
@@ -112,10 +112,10 @@ export function GameInfoDialog() {
               onclick={() => {
                 try {
                   navigator.share({
-                    url: "mural.andrewnathan.net",
+                    text: get_share(game, session),
                   });
                 } catch {
-                  navigator.clipboard.writeText("sharing");
+                  navigator.clipboard.writeText(get_share(game, session));
                 }
               }}
               class="border-2 border-green-400 rounded-lg w-full p-2 text-gray-700 bg-green-400 flex items-center justify-center space-x-2"
