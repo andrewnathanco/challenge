@@ -1,8 +1,12 @@
 FROM node:20-slim AS base
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
+
+ARG VERSION
+ARG BASE_URL
+ENV VITE_VERSION=${VERSION}
+ENV VITE_BASE_URL=${BASE_URL}
+
 RUN corepack enable
-COPY . /app
+COPY package.json pnpm-lock.yaml ./src /app/
 WORKDIR /app
 
 FROM base AS build
