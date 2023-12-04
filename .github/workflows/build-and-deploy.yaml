@@ -30,5 +30,8 @@ jobs:
           context: ./code
           file: ./code/Dockerfile
           push: true
+          build-args: |
+            VERSION=${{steps.meta.outputs.tags}}
+            BASE_URL=ancgames.com/challenge
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
