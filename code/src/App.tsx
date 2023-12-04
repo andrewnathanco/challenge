@@ -29,7 +29,7 @@ const App: Component = () => {
               <div class="text-base text-center">
                 Alternating with the computer, try to make the longest word one
                 letter at a time. You lose if you are the one to finish the
-                word.
+                word. (3 letter words don't count)
               </div>
             </div>
             <SessionView />

@@ -3,20 +3,35 @@ import { TopKeys, MiddleKeys, BottomKeys } from "./key";
 import { useGame } from "../game/context";
 import { DEFAULT_LETTER } from "../game/model";
 import { TileAuthor } from "../tiles/tiles";
-import { get_available_letters } from "../../util/words";
+import {
+  get_available_letters,
+  get_tiles_from_computer,
+} from "../../util/words";
 
 function Keyboard() {
   const [game, set_game] = useGame();
 
   const submit_letter = () => {
+    if (!game.available_letters.includes(game.selected_letter)) {
+      return;
+    }
+
     if (game.selected_letter != DEFAULT_LETTER) {
       set_game("current_tiles", (tiles) => {
-        tiles.push({ author: TileAuthor.User, letter: game.selected_letter });
-        return [...tiles];
+        const new_tile = {
+          author: TileAuthor.User,
+          letter: game.selected_letter,
+        };
+
+        return [
+          ...tiles,
+          new_tile,
+          ...get_tiles_from_computer([...game.current_tiles, new_tile]),
+        ];
       });
 
       set_game("selected_letter", DEFAULT_LETTER);
-      console.log(game.current_tiles.map((tile) => tile.letter).join(""));
+
       set_game(
         "available_letters",
         get_available_letters(
@@ -43,6 +58,16 @@ function Keyboard() {
         const tiles = curr_tiles.slice(0, -2);
         return [...tiles];
       });
+
+      set_game(
+        "available_letters",
+        get_available_letters(
+          game.current_tiles
+            .map((tile) => tile.letter)
+            .join("")
+            .toUpperCase()
+        )
+      );
     }
   };
 
