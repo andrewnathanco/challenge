@@ -31,7 +31,7 @@ jobs:
           file: ./code/Dockerfile
           push: true
           build-args: |
-            VERSION=${{steps.meta.outputs.tags}}
+            VERSION=${{ github.ref_name }}
             BASE_URL=ancgames.com/challenge
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
