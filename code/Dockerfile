@@ -6,7 +6,7 @@ ENV VITE_VERSION=${VERSION}
 ENV VITE_BASE_URL=${BASE_URL}
 
 RUN corepack enable
-COPY package.json pnpm-lock.yaml ./src /app/
+COPY . /app
 WORKDIR /app
 
 FROM base AS build
