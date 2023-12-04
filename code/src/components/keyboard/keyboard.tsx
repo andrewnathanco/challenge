@@ -3,6 +3,7 @@ import { TopKeys, MiddleKeys, BottomKeys } from "./key";
 import { useGame } from "../game/context";
 import { DEFAULT_LETTER } from "../game/model";
 import { TileAuthor } from "../tiles/tiles";
+import { get_available_letters } from "../../util/words";
 
 function Keyboard() {
   const [game, set_game] = useGame();
@@ -15,6 +16,16 @@ function Keyboard() {
       });
 
       set_game("selected_letter", DEFAULT_LETTER);
+      console.log(game.current_tiles.map((tile) => tile.letter).join(""));
+      set_game(
+        "available_letters",
+        get_available_letters(
+          game.current_tiles
+            .map((tile) => tile.letter)
+            .join("")
+            .toUpperCase()
+        )
+      );
     }
   };
 

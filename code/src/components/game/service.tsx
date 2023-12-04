@@ -49,7 +49,7 @@ function get_starting_tiles_from_word(
   let starting_letters: string = "";
 
   word.split("").forEach((lett, index) => {
-    if (index < 3) {
+    if (index < 2) {
       tiles.push({
         letter: lett,
         author: TileAuthor.Computer,
@@ -71,7 +71,7 @@ export function get_todays_game(): Game {
   return {
     game_key: today_game_key,
     starting_word,
-    available_letters: get_available_letters(starting_word),
+    available_letters: get_available_letters(starting_letters),
     starting_tiles,
     starting_letters,
     selected_letter: DEFAULT_LETTER,

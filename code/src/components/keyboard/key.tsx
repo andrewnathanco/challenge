@@ -1,5 +1,3 @@
-import { createEffect } from "solid-js";
-import { get_todays_game } from "../game/service";
 import { useGame } from "../game/context";
 
 const TOP: string[] = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"];
