@@ -1,8 +1,16 @@
 import { Tile } from "../tiles/tiles";
 
-interface Session {}
+export enum SessionStatus {
+  Current,
+  UserWon,
+  ComputerWon,
+}
 
-export const DEFAULT_LETTER = "_";
+export interface Session {
+  status: SessionStatus;
+  tiles: Tile[];
+}
+
 export interface Game {
   game_key: number;
   starting_word: string;

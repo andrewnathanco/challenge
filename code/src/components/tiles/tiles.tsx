@@ -1,15 +1,8 @@
-import { For, createEffect, createSignal } from "solid-js";
-import { DEFAULT_LETTER, Game, GameStore } from "../game/model";
+import { For } from "solid-js";
 import { useGame } from "../game/context";
-
-// TypeScript interfaces for the enums
-enum TileKind {
-  TileEmpty,
-  TileYou,
-  TileComp,
-  TileOkay,
-  TileNotOkay,
-}
+import { DEFAULT_LETTER } from "../game/model";
+import { useSession } from "../session/context";
+import { SessionStatus } from "../session/model";
 
 export enum TileAuthor {
   Computer,
@@ -20,6 +13,15 @@ export enum TileAuthor {
 export interface Tile {
   letter: string; // Assuming that the letter is a string, change it to char if needed
   author: TileAuthor;
+}
+
+export function invert_tile_author(author: TileAuthor) {
+  switch (author) {
+    case TileAuthor.Computer:
+      return TileAuthor.User;
+    case TileAuthor.User:
+      return TileAuthor.Computer;
+  }
 }
 
 enum TileType {
@@ -68,8 +70,10 @@ function tile_to_tile_type(tile: Tile) {
   }
 }
 
-function Tiles() {
-  const [game, set_game] = useGame();
+function Tiles(props: { tiles?: Tile[] }) {
+  const [game, _] = useGame();
+  const [session, __] = useSession();
+  const tiles = props.tiles;
 
   const get_select_tile = () => {
     if (game.selected_letter == DEFAULT_LETTER) {
@@ -79,7 +83,9 @@ function Tiles() {
           tile_type={TileType.empty_select_tile}
         />
       );
-    } else if (game.available_letters.includes(game.selected_letter)) {
+    } else if (
+      game.available_letters.includes(game.selected_letter.toLowerCase())
+    ) {
       return (
         <TileView
           letter={game.selected_letter}
@@ -99,7 +105,7 @@ function Tiles() {
   return (
     <div class="flex-1 flex items-center justify-center">
       <ul class="flex flex-wrap gap-y-1 gap-x-1 max-w-screen text-2xl justify-center items-center uppercase">
-        <For each={game.current_tiles}>
+        <For each={tiles ?? game.current_tiles}>
           {(tile, _) => {
             return (
               <TileView
@@ -109,7 +115,7 @@ function Tiles() {
             );
           }}
         </For>
-        {get_select_tile()}
+        {session.status == SessionStatus.Current ? get_select_tile() : <></>}
       </ul>
     </div>
   );

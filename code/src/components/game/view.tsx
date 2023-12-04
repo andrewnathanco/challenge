@@ -1,13 +1,6 @@
-import { makePersisted } from "@solid-primitives/storage";
 import { createEffect, createSignal } from "solid-js";
-import { createStoredSignal } from "../../util/storage";
-import words from "../../util/valid_words.json";
-import { get_available_letters } from "../../util/words";
-import { Tile, TileAuthor } from "../tiles/tiles";
-import { DEFAULT_LETTER, Game, GameStore } from "./model";
-import { get_game_key, get_todays_game } from "./service";
-import { SetStoreFunction, Store, createStore } from "solid-js/store";
 import { useGame } from "./context";
+import { get_game_key, get_todays_game } from "./service";
 
 export function GameHeader() {
   const [game, set_game] = useGame();

@@ -1,18 +1,17 @@
-import {
-  Accessor,
-  JSX,
-  Signal,
-  createContext,
-  createEffect,
-  createSignal,
-  useContext,
-} from "solid-js";
+import { createEffect, createSignal } from "solid-js";
+import { useGame } from "../game/context";
+import { get_countdown_till_next_game, get_todays_game } from "../game/service";
 import { useGameInfoDialog } from "./context";
-import { get_countdown_till_next_game } from "../game/service";
+import { get_default_session } from "../session/service";
+import { useSession } from "../session/context";
+import { SessionStatus } from "../session/model";
+import { Tiles, invert_tile_author } from "../tiles/tiles";
 
 export function GameInfoDialog() {
+  const [game, set_game] = useGame();
+  const [session, set_session] = useSession();
+
   const [is_open, { open, close }] = useGameInfoDialog();
-  const [tiles, set_tiles] = createSignal("tles");
   const [countdown, set_countdown] = createSignal(
     get_countdown_till_next_game()
   );
@@ -32,7 +31,13 @@ export function GameInfoDialog() {
             id="dialog-header"
             class="flex justify-between items-center text-3xl w-full"
           >
-            <div>Game Stats</div>
+            <div>
+              {session.status == SessionStatus.UserWon
+                ? "You Won"
+                : session.status == SessionStatus.ComputerWon
+                ? "Computer Won"
+                : ""}
+            </div>
             <button
               onClick={() => {
                 close();
@@ -53,7 +58,20 @@ export function GameInfoDialog() {
             </button>
           </div>
           <div class="flex-1 flex flex-col justify-center items-center">
-            {tiles()}
+            {session.status != SessionStatus.Current ? (
+              <Tiles
+                tiles={game.current_tiles.map((tile) => {
+                  return {
+                    ...tile,
+                    author: invert_tile_author(
+                      game.current_tiles[game.current_tiles.length - 1].author
+                    ),
+                  };
+                })}
+              />
+            ) : (
+              <></>
+            )}
           </div>
           <div class="flex flex-col space-y-2">
             <div id="timer" class="flex flex-col space-y-1 items-center">
@@ -61,10 +79,20 @@ export function GameInfoDialog() {
                 {countdown()}
               </div>
               <div id="text" class="text-2xl">
-                "Next Challenge"
+                Next Challenge
               </div>
             </div>
-            <button class="border-2 border-gray-300 rounded-lg w-full p-2 text-gray-700 bg-gray-300 flex items-center justify-center space-x-2">
+            <button
+              class="border-2 border-gray-300 rounded-lg w-full p-2 text-gray-700 bg-gray-300 flex items-center justify-center space-x-2"
+              onclick={() => {
+                set_game({
+                  ...get_todays_game(),
+                  sessions: [...game.sessions],
+                });
+                set_session(get_default_session());
+                close();
+              }}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -78,7 +106,7 @@ export function GameInfoDialog() {
                 ></path>
               </svg>
 
-              <div>"Try Again"</div>
+              <div>Try Again</div>
             </button>
             <button
               onclick={() => {

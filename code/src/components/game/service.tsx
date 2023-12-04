@@ -1,7 +1,7 @@
+import words from "../../util/valid_words.json";
 import { get_available_letters } from "../../util/words";
 import { Tile, TileAuthor } from "../tiles/tiles";
 import { DEFAULT_LETTER, Game } from "./model";
-import words from "../../util/valid_words.json";
 
 function padZero(num: number): string {
   return num < 10 ? `0${num}` : `${num}`;

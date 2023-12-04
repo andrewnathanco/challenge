@@ -11,7 +11,7 @@ function Key(props: { letter: string }) {
     <button
       class="w-8 h-16 bg-gray-300 rounded-lg cursor-pointer border-2 border-gray-400"
       onclick={() => {
-        set_game("selected_letter", props.letter);
+        set_game("selected_letter", props.letter.toLocaleLowerCase());
       }}
     >
       {letter}
@@ -48,4 +48,4 @@ function BottomKeys() {
     </>
   );
 }
-export { TopKeys, BottomKeys, MiddleKeys };
+export { BottomKeys, MiddleKeys, TopKeys };

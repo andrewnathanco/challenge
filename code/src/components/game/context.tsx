@@ -1,9 +1,8 @@
-import { Signal, createContext, createSignal, useContext } from "solid-js";
+import { makePersisted } from "@solid-primitives/storage";
+import { createContext, useContext } from "solid-js";
+import { SetStoreFunction, createStore } from "solid-js/store";
 import { Game } from "./model";
 import { get_todays_game } from "./service";
-import { createStoredSignal } from "../../util/storage";
-import { makePersisted } from "@solid-primitives/storage";
-import { SetStoreFunction, createStore } from "solid-js/store";
 
 const GameContext = createContext<[Game, SetStoreFunction<Game>]>([
   {} as Game,

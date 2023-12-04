@@ -7,12 +7,49 @@ import {
   get_available_letters,
   get_tiles_from_computer,
 } from "../../util/words";
+import words from "../../util/valid_words.json";
+import { useGameInfoDialog } from "../game_info_dialog/context";
+import { useSession } from "../session/context";
+import { Session, SessionStatus } from "../session/model";
 
 function Keyboard() {
   const [game, set_game] = useGame();
+  const [session, set_session] = useSession();
+  const [_, { open }] = useGameInfoDialog();
+
+  createEffect(() => {
+    let current_word = game.current_tiles
+      .map((tile) => tile.letter.toLowerCase())
+      .join("");
+
+    let is_valid_word = words.includes(current_word);
+    if (is_valid_word && session.status == SessionStatus.Current) {
+      let winning_author =
+        game.current_tiles[game.current_tiles.length - 1].author;
+
+      let new_session: Session = {
+        status:
+          winning_author == TileAuthor.User
+            ? SessionStatus.ComputerWon
+            : SessionStatus.UserWon,
+        tiles: game.current_tiles,
+      };
+
+      set_session(new_session);
+      set_game("sessions", (sessions) => {
+        return [...sessions, new_session];
+      });
+
+      open();
+    }
+  });
 
   const submit_letter = () => {
-    if (!game.available_letters.includes(game.selected_letter)) {
+    // only submit the letters if we have available letters
+    let letter_avail = !game.available_letters.includes(game.selected_letter);
+    let game_current = session.status == SessionStatus.Current;
+
+    if (letter_avail || !game_current) {
       return;
     }
 
@@ -38,15 +75,20 @@ function Keyboard() {
           game.current_tiles
             .map((tile) => tile.letter)
             .join("")
-            .toUpperCase()
+            .toLowerCase()
         )
       );
     }
   };
 
   const remove_letter = () => {
+    let game_current = session.status == SessionStatus.Current;
+    // if we the game isn't current then this should be read only
+    if (!game_current) return;
+
     if (game.selected_letter !== DEFAULT_LETTER) {
       set_game("selected_letter", DEFAULT_LETTER);
+      return;
     }
 
     // This makes sure we don't go past the starting tiles
@@ -65,7 +107,7 @@ function Keyboard() {
           game.current_tiles
             .map((tile) => tile.letter)
             .join("")
-            .toUpperCase()
+            .toLowerCase()
         )
       );
     }
@@ -77,7 +119,7 @@ function Keyboard() {
     const code = ev.code;
     if (code.startsWith("Key")) {
       const key = code.slice(3);
-      set_game("selected_letter", key.charAt(0) || "");
+      set_game("selected_letter", key.charAt(0).toLowerCase() || "");
     }
 
     if (code === "Enter") {
