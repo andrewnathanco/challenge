@@ -1,27 +1,25 @@
-import {
-  Accessor,
-  Signal,
-  createContext,
-  createEffect,
-  createSignal,
-  useContext,
-} from "solid-js";
+import { Signal, createContext, createSignal, useContext } from "solid-js";
 import { Game } from "./model";
 import { get_todays_game } from "./service";
 import { createStoredSignal } from "../../util/storage";
+import { makePersisted } from "@solid-primitives/storage";
+import { SetStoreFunction, createStore } from "solid-js/store";
 
-const GameContext = createContext<Signal<Game>>();
+const GameContext = createContext<[Game, SetStoreFunction<Game>]>([
+  {} as Game,
+  () => {},
+]);
 
-export function GameProvider(props: { game: Game; children: any }) {
-  const stored_game = createSignal(props.game);
+export function GameProvider(props: any) {
+  let value = makePersisted(createStore(get_todays_game()), {
+    name: "game",
+  });
 
   return (
-    <GameContext.Provider value={stored_game}>
-      {props.children}
-    </GameContext.Provider>
+    <GameContext.Provider value={value}>{props.children}</GameContext.Provider>
   );
 }
 
-export function useGame(): Signal<Game> {
-  return useContext(GameContext) as Signal<Game>;
+export function useGame() {
+  return useContext(GameContext);
 }

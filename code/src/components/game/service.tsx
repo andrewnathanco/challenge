@@ -75,7 +75,7 @@ export function get_todays_game(): Game {
     starting_tiles,
     starting_letters,
     selected_letter: DEFAULT_LETTER,
-    current_tiles: starting_tiles,
+    current_tiles: [...starting_tiles],
     sessions: [],
   };
 }

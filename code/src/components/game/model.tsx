@@ -1,3 +1,4 @@
+import { SetStoreFunction, Store } from "solid-js/store";
 import { Tile } from "../tiles/tiles";
 
 interface Session {}
@@ -15,3 +16,5 @@ export interface Game {
 
   sessions: Session[];
 }
+
+export type GameStore = [Store<Game>, SetStoreFunction<Game>];

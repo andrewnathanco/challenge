@@ -1,15 +1,18 @@
-import { useContext } from "solid-js";
+import { createEffect, useContext } from "solid-js";
 import Keyboard from "../keyboard/keyboard";
 import { Tile, TileAuthor, Tiles } from "../tiles/tiles";
 import { useGameInfoDialog } from "../game_info_dialog/context";
+import { SetStoreFunction, Store } from "solid-js/store";
+import { Game, GameStore } from "../game/model";
 import { useGame } from "../game/context";
 
 function SessionView() {
-  let [game, __] = useGame();
   let [_, { open }] = useGameInfoDialog();
+  let [game, set_game] = useGame();
+
   return (
     <div class="flex flex-col justify-between space-y-2 h-full w-full">
-      <Tiles tiles={game().current_tiles} />
+      <Tiles />
       <Keyboard />
       <div class="flex flex-col space-y-2">
         <button

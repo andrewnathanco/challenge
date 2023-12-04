@@ -1,4 +1,5 @@
 import { For, createEffect, createSignal } from "solid-js";
+import { GameStore } from "../game/model";
 import { useGame } from "../game/context";
 
 // TypeScript interfaces for the enums
@@ -67,21 +68,13 @@ function tile_to_tile_type(tile: Tile) {
   }
 }
 
-function Tiles(props: { tiles: Tile[] }) {
-  const tiles = props.tiles;
+function Tiles() {
   const [game, set_game] = useGame();
-  const [selected_letter, set_selected_letter] = createSignal(
-    game().selected_letter
-  );
-
-  createEffect(() => {
-    console.log(game().selected_letter);
-  });
 
   return (
     <div class="flex-1 flex items-center justify-center">
       <ul class="flex flex-wrap gap-y-1 gap-x-1 max-w-screen text-2xl justify-center items-center uppercase">
-        <For each={tiles}>
+        <For each={game.current_tiles}>
           {(tile, index) => {
             return (
               <TileView
@@ -92,7 +85,7 @@ function Tiles(props: { tiles: Tile[] }) {
           }}
         </For>
         <TileView
-          letter={selected_letter()}
+          letter={game.selected_letter}
           tile_type={TileType.empty_select_tile}
         />
       </ul>

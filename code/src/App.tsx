@@ -5,26 +5,22 @@ import {
   useContext,
   createContext,
 } from "solid-js";
-import Keyboard from "./components/keyboard/keyboard";
 import { GameHeader } from "./components/game/view";
-import words from "./util/valid_words.json";
 import { GameInfoDialog } from "./components/game_info_dialog/dialog";
-import { Tiles } from "./components/tiles/tiles";
 import { SessionView } from "./components/session/session";
 import { GameInfoDialogProvider } from "./components/game_info_dialog/context";
+import { makePersisted } from "@solid-primitives/storage";
+import { createMutable, createStore } from "solid-js/store";
+import { get_todays_game } from "./components/game/service";
 import { GameProvider } from "./components/game/context";
-import { get_game_key, get_todays_game } from "./components/game/service";
 
 const App: Component = () => {
   // dialog context
   let game_info_dialog = createSignal(false);
   createContext(game_info_dialog, { name: "info_dialog" });
 
-  // game context
-  createContext(get_todays_game(), { name: "game" });
-
   return (
-    <GameProvider game={get_todays_game()}>
+    <GameProvider>
       <GameInfoDialogProvider>
         <div class="w-full flex h-full flex-col justify-center items-center">
           <div class="flex text-xl justify-between flex-col p-4 space-y-4 h-full text-gray-700 w-96">
