@@ -11,6 +11,7 @@ ARG VERSION
 ARG BASE_URL
 ENV VITE_VERSION=${VERSION}
 ENV VITE_BASE_URL=${BASE_URL}
+ENV BASE_PATH=${BASE_PATH}
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
