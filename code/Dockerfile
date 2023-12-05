@@ -8,9 +8,12 @@ WORKDIR /app
 FROM base AS build
 
 ARG VERSION
-ARG BASE_URL
 ENV VITE_VERSION=${VERSION}
+
+ARG BASE_URL
 ENV VITE_BASE_URL=${BASE_URL}
+
+ARG BASE_PATH
 ENV BASE_PATH=${BASE_PATH}
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
