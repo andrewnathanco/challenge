@@ -1,0 +1,13 @@
+version: "3"
+services:
+  challenge_$VERSION:
+    image: andyrewco/challenge:$VERSION
+    container_name: challenge-$VERSION
+    ports:
+      - $PORT:80
+    networks:
+      - challenge_$VERSION
+
+networks:
+  challenge_$VERSION:
+    driver: bridge
