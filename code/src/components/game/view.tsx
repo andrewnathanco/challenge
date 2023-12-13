@@ -11,6 +11,7 @@ export function GameHeader() {
 
   createEffect(() => {
     if (get_game_key() != game.game_key) {
+      localStorage.removeItem("challenge_game");
       set_game(get_todays_game());
     }
   });

@@ -30,32 +30,6 @@ function get_tiles_from_computer(tiles: Tile[]): Tile[] {
 
   let comp_letter = "";
 
-  // this is the case where the user got themselves trapped and there's no winning
-  if (possible_answers_where_comp_wins.length == all_possible.length) {
-    // if there is a word that is one letter away from being found pick that one
-    for (let word of all_possible) {
-      if (word.length - 2 == current_word.length) {
-        const index: number = Math.floor(
-          Math.random() * possible_answers_where_comp_wins.length
-        );
-
-        const losing_word: string = possible_answers_where_comp_wins[index];
-        let losing_tiles: Tile[] = [
-          {
-            letter: losing_word[losing_word.length - 2],
-            author: TileAuthor.Computer,
-          },
-          {
-            letter: losing_word[losing_word.length - 1],
-            author: TileAuthor.User,
-          },
-        ];
-
-        return losing_tiles;
-      }
-    }
-  }
-
   // now lets try to get back an answer that will give the computer the win
   if (possible_answers_where_comp_wins.length > 0) {
     const index: number = Math.floor(

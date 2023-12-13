@@ -1,7 +1,7 @@
 import { makePersisted } from "@solid-primitives/storage";
 import { createContext, useContext } from "solid-js";
 import { SetStoreFunction, createStore } from "solid-js/store";
-import { Game, Session } from "./model";
+import { Session } from "./model";
 import { get_default_session } from "./service";
 
 const SessionContext = createContext<[Session, SetStoreFunction<Session>]>([
@@ -11,7 +11,7 @@ const SessionContext = createContext<[Session, SetStoreFunction<Session>]>([
 
 export function SessionProvider(props: any) {
   let value = makePersisted(createStore(get_default_session()), {
-    name: "session",
+    name: "challenge_session",
   });
 
   return (
