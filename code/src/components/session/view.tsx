@@ -48,7 +48,7 @@ function SessionView() {
         </button>
         {session.status != SessionStatus.Current ? (
           <a
-            href={`https://scrabble.merriam.com/finder/${game.current_tiles
+            href={`https://www.merriam-webster.com/dictionary/${game.current_tiles
               .map((tile) => tile.letter.toLowerCase())
               .join("")}`}
             target="_blank"

@@ -136,7 +136,7 @@ export function GameInfoDialog() {
               <div>Share</div>
             </button>
             <a
-              href={`https://scrabble.merriam.com/finder/${game.current_tiles
+              href={`https://www.merriam-webster.com/dictionary/${game.current_tiles
                 .map((tile) => tile.letter.toLowerCase())
                 .join("")}`}
               target="_blank"
