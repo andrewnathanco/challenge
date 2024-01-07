@@ -4,6 +4,7 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 COPY . /app
 WORKDIR /app
+RUN ls -a ./src
 
 FROM base AS build
 
@@ -21,6 +22,7 @@ ENV VITE_SHARE_URL=${SHARE_URL}
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install
 RUN ls -a ./src
+RUN mv ./src/App.tsx ./src/app.tsx
 RUN pnpm run build
 
 FROM base
