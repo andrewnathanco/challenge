@@ -5,8 +5,6 @@ RUN corepack enable
 COPY . /app
 WORKDIR /app
 
-FROM base AS build
-
 ARG VERSION
 ENV VITE_VERSION=${VERSION}
 
@@ -19,10 +17,7 @@ ENV VITE_DB_URL=${MURAL_DB}
 ARG SHARE_URL
 ENV VITE_SHARE_URL=${SHARE_URL}
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install
 RUN pnpm run build
 
-FROM base
-COPY --from=build /app/node_modules /app/node_modules
-COPY --from=build /app/dist /app/dist
 CMD [ "pnpm", "start" ]
