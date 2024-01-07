@@ -9,7 +9,7 @@ export default function App() {
   return (
     <MetaProvider>
       <Router
-        base={process.env.BASE_PATH || "/"}
+        base={process.env.VITE_BASE_PATH || "/"}
         root={(props) => (
           <>
             <Suspense>{props.children}</Suspense>
