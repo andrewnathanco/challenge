@@ -20,7 +20,7 @@ ARG SHARE_URL
 ENV VITE_SHARE_URL=${SHARE_URL}
 
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install
-RUN ls -a
+RUN ls -a ./src
 RUN pnpm run build
 
 FROM base
