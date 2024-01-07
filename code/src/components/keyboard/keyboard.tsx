@@ -3,14 +3,14 @@ import { TopKeys, MiddleKeys, BottomKeys } from "./key";
 import { useGame } from "../game/context";
 import { DEFAULT_LETTER } from "../game/model";
 import { TileAuthor } from "../tiles/tiles";
-import {
-  get_available_letters,
-  get_tiles_from_computer,
-} from "../../util/words";
 import words from "../../util/valid_words.json";
 import { useGameInfoDialog } from "../game_info_dialog/context";
 import { useSession } from "../session/context";
 import { Session, SessionStatus } from "../session/model";
+import {
+  get_available_letters,
+  get_tiles_from_computer,
+} from "../../util/words";
 
 function Keyboard() {
   const [game, set_game] = useGame();
@@ -142,7 +142,7 @@ function Keyboard() {
   return (
     <div
       id="keyboard"
-      class="flex flex-col space-y-1 w-full items-center text-sm text-gray-700"
+      class="p-4 flex flex-col space-y-1 w-full items-center text-sm text-mallard-900"
     >
       <div id="top-row" class="flex flex-row space-between space-x-1">
         <TopKeys />
@@ -152,14 +152,14 @@ function Keyboard() {
       </div>
       <div id="bottom-row" class="flex flex-row space-between space-x-1">
         <button
-          class="border-2 p-1 h-16 bg-green-300 border-green-400 rounded-lg cursor-pointer items-center justify-center flex"
+          class="border-2 p-1 h-16 bg-stack-400 border-stack-400 text-sun-50 rounded-lg cursor-pointer items-center justify-center flex"
           onclick={submit_letter}
         >
           ENTER
         </button>
         <BottomKeys />
         <button
-          class="border-2 w-12 h-16 bg-red-300 border-red-400 rounded-lg cursor-pointer justify-center items-center flex"
+          class="border-2 w-12 h-16 bg-stiletto-600 border-stiletto-600 text-sun-50 rounded-lg cursor-pointer justify-center items-center flex"
           onclick={remove_letter}
         >
           <svg

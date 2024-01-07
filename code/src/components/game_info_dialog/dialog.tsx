@@ -25,7 +25,7 @@ export function GameInfoDialog() {
   return (
     <div classList={{ hidden: !is_open(), block: is_open() }}>
       <div class="z-10 absolute top-0 left-0 right-0 bottom-0 justify-center items-center bg-black flex opacity-70"></div>
-      <div class="z-20 absolute top-0 left-0 right-0 bottom-0 bg-white flex m-4 rounded-lg">
+      <div class="z-20 absolute top-0 left-0 right-0 bottom-0 bg-sun-50 flex m-4 rounded-lg">
         <div id="dialog-content" class="p-8 flex flex-col space-y-2 w-full">
           <div
             id="dialog-header"
@@ -83,7 +83,7 @@ export function GameInfoDialog() {
               </div>
             </div>
             <button
-              class="border-2 border-gray-300 rounded-lg w-full p-2 text-gray-700 bg-gray-300 flex items-center justify-center space-x-2"
+              class="border-2 border-stone-700 rounded-lg w-full p-2 text-sun-50 bg-stone-700 flex items-center justify-center space-x-2"
               onclick={() => {
                 set_game({
                   ...get_todays_game(),
@@ -118,7 +118,7 @@ export function GameInfoDialog() {
                   navigator.clipboard.writeText(get_share(game, session));
                 }
               }}
-              class="border-2 border-green-400 rounded-lg w-full p-2 text-gray-700 bg-green-400 flex items-center justify-center space-x-2"
+              class="border-2 border-mallard-700 rounded-lg w-full p-2 text-sun-50 bg-mallard-700 flex items-center justify-center space-x-2"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -135,6 +135,31 @@ export function GameInfoDialog() {
 
               <div>Share</div>
             </button>
+            <a
+              href={`https://scrabble.merriam.com/finder/${game.current_tiles
+                .map((tile) => tile.letter.toLowerCase())
+                .join("")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="border-2 border-sahara-800 rounded-lg w-full p-2 text-sun-50 bg-sahara-800 flex items-center justify-center space-x-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-6 h-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
+                />
+              </svg>
+
+              <div>Define</div>
+            </a>
           </div>
         </div>
       </div>

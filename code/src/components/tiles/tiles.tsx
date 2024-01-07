@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { For, createEffect } from "solid-js";
 import { useGame } from "../game/context";
 import { DEFAULT_LETTER } from "../game/model";
 import { useSession } from "../session/context";
@@ -44,14 +44,16 @@ function TileView(props: { letter: string; tile_type: TileType }) {
   return (
     <li
       classList={{
-        "text-gray-300 border-gray-300":
+        "text-stack-400 border-stack-400":
           tile_type == TileType.empty_select_tile,
-        "text-red-600 border-red-600":
+        "text-stiletto-600 border-stiletto-600":
           tile_type == TileType.not_okay_select_tile,
-        "border-green-600 text-green-600":
+        "border-mallard-600 text-mallard-600":
           tile_type == TileType.okay_select_tile,
-        "bg-green-300 border-green-500 ": tile_type == TileType.you_tile,
-        "bg-gray-300 border-gray-400": tile_type == TileType.computer_tile,
+        "bg-mallard-600 border-mallard-600 text-sun-50":
+          tile_type == TileType.you_tile,
+        "bg-stack-500 border-stack-500 text-sun-50":
+          tile_type == TileType.computer_tile,
         "bg-red-300 border-red-500": tile_type == TileType.lost_tile,
       }}
       class="w-16 h-20 border-2 rounded-lg flex justify-center items-center"
@@ -74,6 +76,10 @@ function Tiles(props: { tiles?: Tile[] }) {
   const [game, _] = useGame();
   const [session, __] = useSession();
   const tiles = props.tiles;
+
+  createEffect(() => {
+    console.log(tiles);
+  });
 
   const get_select_tile = () => {
     if (game.selected_letter == DEFAULT_LETTER) {
