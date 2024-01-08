@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 500 500" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-23.575,-0.204025)">
+        <g>
+            <g transform="matrix(1,0,0,1,-90.7172,0)">
+                <g transform="matrix(0.453131,0,0,0.582997,141.874,100.877)">
+                    <path d="M474.134,79.922L474.134,432.351C474.134,456.311 449.106,475.764 418.279,475.764L90.734,475.764C59.907,475.764 34.879,456.311 34.879,432.351L34.879,79.922C34.879,55.962 59.907,36.509 90.734,36.509L418.279,36.509C449.106,36.509 474.134,55.962 474.134,79.922Z" style="fill:rgb(97,107,101);"/>
+                </g>
+                <g transform="matrix(1.91969,0,0,1.90725,-240.857,-167.35)">
+                    <g transform="matrix(50,0,0,50,277.244,236.825)">
+                    </g>
+                    <text x="241.136px" y="236.825px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:50px;fill:rgb(254,250,224);">C</text>
+                </g>
+            </g>
+            <g transform="matrix(1,0,0,1,123.47,0)">
+                <g transform="matrix(0.453131,0,0,0.582997,141.874,100.877)">
+                    <path d="M474.134,79.922L474.134,432.351C474.134,456.311 449.106,475.764 418.279,475.764L90.734,475.764C59.907,475.764 34.879,456.311 34.879,432.351L34.879,79.922C34.879,55.962 59.907,36.509 90.734,36.509L418.279,36.509C449.106,36.509 474.134,55.962 474.134,79.922Z" style="fill:rgb(97,107,101);"/>
+                </g>
+                <g transform="matrix(1.91969,0,0,1.90725,-240.857,-167.35)">
+                    <g transform="matrix(50,0,0,50,277.244,236.825)">
+                    </g>
+                    <text x="241.136px" y="236.825px" style="font-family:'Arial-BoldMT', 'Arial', sans-serif;font-weight:700;font-size:50px;fill:rgb(254,250,224);">H</text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

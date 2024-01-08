@@ -14,6 +14,8 @@ import { get_current_number_played } from "../util/service";
 import { get_default_session } from "../components/session/service";
 import { GameInfoDialogProvider } from "../components/game_info_dialog/context";
 import { GameInfoDialog } from "../components/game_info_dialog/dialog";
+import { InfoDialogProvider } from "../components/info_dialog/context";
+import { InfoDialog } from "../components/info_dialog/dialog";
 
 const App: Component = () => {
   // dialog context
@@ -37,25 +39,30 @@ const App: Component = () => {
     set_game("game_key", get_game_key());
   });
 
+  createEffect(() => {});
+
   return (
     <>
       <Meta
         name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=0"
       />
-      <GameProvider>
-        <SessionProvider>
-          <GameInfoDialogProvider>
-            <div class="w-full flex h-full flex-col justify-center items-center">
-              <div class="flex text-lg justify-between flex-col p-4 space-y-4 h-full text-stack-700 w-96">
-                <GameInfo />
-                <SessionView />
-                <GameInfoDialog />
+      <InfoDialogProvider>
+        <GameProvider>
+          <SessionProvider>
+            <GameInfoDialogProvider>
+              <div class="w-full flex h-full flex-col justify-center items-center">
+                <div class="flex text-lg justify-between flex-col p-4 space-y-4 h-full text-stack-700 w-96">
+                  <GameInfo />
+                  <SessionView />
+                  <GameInfoDialog />
+                  <InfoDialog />
+                </div>
               </div>
-            </div>
-          </GameInfoDialogProvider>
-        </SessionProvider>
-      </GameProvider>
+            </GameInfoDialogProvider>
+          </SessionProvider>
+        </GameProvider>
+      </InfoDialogProvider>
     </>
   );
 };
