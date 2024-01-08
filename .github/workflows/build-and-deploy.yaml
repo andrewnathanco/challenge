@@ -32,7 +32,7 @@ jobs:
           push: true
           build-args: |
             VERSION=${{ github.ref_name }}
-            BASE_URL=ancgames.com/challenge
+            BASE_URL=https://ancgames.com/challenge
             BASE_PATH=/challenge
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
