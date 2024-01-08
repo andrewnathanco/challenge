@@ -10,7 +10,7 @@
   "dependencies": {
     "@solid-primitives/storage": "^2.1.1",
     "@solidjs/meta": "^0.29.3",
-    "@solidjs/router": "^0.10.5",
+    "@solidjs/router": "^0.10.6",
     "@solidjs/start": "^0.4.2",
     "@vitejs/plugin-basic-ssl": "^1.0.2",
     "autoprefixer": "^10.4.14",

@@ -110,12 +110,17 @@ export function GameInfoDialog() {
             </button>
             <button
               onclick={() => {
+                const [text, url] = get_share(game, session);
+
+                console.log(`${text}\n${url}`);
+
                 try {
                   navigator.share({
-                    text: get_share(game, session),
+                    text,
+                    url,
                   });
                 } catch {
-                  navigator.clipboard.writeText(get_share(game, session));
+                  navigator.clipboard.writeText(`${text}\n${url}`);
                 }
               }}
               class="border-2 border-mallard-700 rounded-lg w-full p-2 text-sun-50 bg-mallard-700 flex items-center justify-center space-x-2"

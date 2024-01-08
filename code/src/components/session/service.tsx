@@ -1,6 +1,7 @@
 import { Game } from "../game/model";
 import { TileAuthor, invert_tile_author } from "../tiles/tiles";
 import { Session, SessionStatus } from "./model";
+import words from "../../util/valid_words.json";
 
 function get_default_session(): Session {
   return {
@@ -19,11 +20,18 @@ function get_share(game: Game, session: Session) {
     };
   });
 
-  return `Challenge #${game.game_key}:\n\n${new_tiles
-    .map((tile) => (tile.author == TileAuthor.Computer ? "⬜️" : "🟩"))
-    .join("")} (${new_tiles.length})\n\nplay at ${
+  const share_url = `${
     import.meta.env.VITE_BASE_URL
-  }`;
+  }/share?word=${words.indexOf(
+    game.current_tiles.map((tile) => tile.letter.toLowerCase()).join("")
+  )}&status=${session.status}`;
+
+  return [
+    `Challenge #${game.game_key}:\n\n${new_tiles
+      .map((tile) => (tile.author == TileAuthor.Computer ? "⬜️" : "🟩"))
+      .join("")}`,
+    share_url,
+  ];
 }
 
 export { get_default_session, get_share };

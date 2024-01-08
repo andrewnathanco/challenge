@@ -77,10 +77,6 @@ function Tiles(props: { tiles?: Tile[] }) {
   const [session, __] = useSession();
   const tiles = props.tiles;
 
-  createEffect(() => {
-    console.log(tiles);
-  });
-
   const get_select_tile = () => {
     if (game.selected_letter == DEFAULT_LETTER) {
       return (
