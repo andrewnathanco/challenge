@@ -18,8 +18,8 @@ export function ShareInfoDialog() {
       <div class="z-20 absolute top-0 left-0 right-0 bottom-0 bg-sun-50 flex m-4 rounded-lg">
         <div id="dialog-content" class="p-8 flex flex-col space-y-2 w-full">
           <div id="dialog-header" class="flex flex-col text-3xl space-y-2">
-            <div class="text-xl italic  text-stiletto-600">
-              <a href="/" class="hover:underline">
+            <div class="text-xl italic">
+              <a href={import.meta.env.SERVER_BASE_URL} class="underline">
                 play today's game
               </a>
             </div>
