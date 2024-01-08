@@ -28,8 +28,6 @@ const App: Component = () => {
 
   createEffect(() => {
     if (game.game_key != get_game_key()) {
-      localStorage.removeItem("challenge_game");
-      localStorage.removeItem("challenge_session");
       set_game({
         ...get_todays_game(),
       });
