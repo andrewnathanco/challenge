@@ -112,8 +112,6 @@ export function GameInfoDialog() {
               onclick={() => {
                 const [text, url] = get_share(game, session);
 
-                console.log(`${text}\n${url}`);
-
                 try {
                   navigator.share({
                     text,

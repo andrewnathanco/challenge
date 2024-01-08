@@ -27,9 +27,9 @@ function get_share(game: Game, session: Session) {
   )}&status=${session.status}`;
 
   return [
-    `Challenge #${game.game_key}:\n\n${new_tiles
-      .map((tile) => (tile.author == TileAuthor.Computer ? "⬜️" : "🟩"))
-      .join("")}`,
+    `Challenge #${game.game_key}\nScore: ${
+      session.status == SessionStatus.UserWon ? game.current_tiles.length : "❎"
+    }`,
     share_url,
   ];
 }
