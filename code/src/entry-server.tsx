@@ -5,6 +5,11 @@ export default createHandler(() => (
     document={({ assets, children, scripts }) => (
       <html lang="en">
         <head>
+          <script
+            defer
+            data-domain="ancgames.com"
+            src="https://plausible.io/js/script.js"
+          ></script>
           <meta charset="utf-8" />
           <link rel="icon" href="/favicon.ico" />
           {assets}
