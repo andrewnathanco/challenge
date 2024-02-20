@@ -49,7 +49,16 @@ const App: Component = () => {
         <GameProvider>
           <SessionProvider>
             <GameInfoDialogProvider>
-              <div class="w-full flex h-full flex-col justify-center items-center">
+              <div class="w-full flex h-full flex-col justify-center items-center p-4">
+                <div class="rounded-lg p-4 border-2 border-stack-700 flex space-x-1 w-96 justify-center">
+                  <div>Play other daily games</div>
+                  <a
+                    class="text-mallard-600 underline"
+                    href="https://ancgames.com"
+                  >
+                    here.
+                  </a>
+                </div>
                 <div class="flex text-lg justify-between flex-col p-4 space-y-4 h-full text-stack-700 w-96">
                   <GameInfo />
                   <SessionView />
