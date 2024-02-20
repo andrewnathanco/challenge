@@ -1,13 +1,8 @@
-import {
-  type Component,
-  createSignal,
-  createContext,
-  createEffect,
-} from "solid-js";
+import { type Component } from "solid-js";
 import { Meta } from "@solidjs/meta";
 import { ShareInfoDialog } from "../components/share/dialog";
 
-const App: Component = () => {
+export function Share() {
   return (
     <>
       <Meta
@@ -17,6 +12,4 @@ const App: Component = () => {
       <ShareInfoDialog />
     </>
   );
-};
-
-export default App;
+}

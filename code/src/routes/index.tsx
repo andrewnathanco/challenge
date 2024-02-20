@@ -10,14 +10,13 @@ import { GameProvider, useGame } from "../components/game/context";
 import { SessionProvider, useSession } from "../components/session/context";
 import { Meta } from "@solidjs/meta";
 import { get_game_key, get_todays_game } from "../components/game/service";
-import { get_current_number_played } from "../util/service";
 import { get_default_session } from "../components/session/service";
 import { GameInfoDialogProvider } from "../components/game_info_dialog/context";
 import { GameInfoDialog } from "../components/game_info_dialog/dialog";
 import { InfoDialogProvider } from "../components/info_dialog/context";
 import { InfoDialog } from "../components/info_dialog/dialog";
 
-const App: Component = () => {
+export default function Index() {
   // dialog context
   let game_info_dialog = createSignal(false);
 
@@ -63,6 +62,4 @@ const App: Component = () => {
       </InfoDialogProvider>
     </>
   );
-};
-
-export default App;
+}
