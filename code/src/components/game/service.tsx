@@ -12,7 +12,7 @@ export function get_countdown_till_next_game(): string {
   const now = new Date();
 
   // midnight EST in UTC
-  const midnight = new Date(
+  let midnight = new Date(
     now.getFullYear(),
     now.getMonth(),
     now.getDate(),
@@ -21,6 +21,9 @@ export function get_countdown_till_next_game(): string {
     0,
     0
   );
+
+  const estOffset = -5 * 60; // EST is UTC-5 hours
+  midnight = new Date(midnight.getTime() + estOffset * 60 * 1000);
 
   // Calculate the duration until midnight EST
   const durationUntilMidnight = midnight.getTime() - now.getTime();
