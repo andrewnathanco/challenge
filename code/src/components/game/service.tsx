@@ -35,9 +35,13 @@ export function get_countdown_till_next_game(): string {
 
 export function get_game_key() {
   const now: Date = new Date();
-  const specificDate: Date = new Date(2023, 10, 26, 5, 0, 0);
+  const firstGame: Date = new Date(2023, 10, 26, 5, 0, 0);
+
+  const estOffset = -5 * 60; // EST is UTC-5 hours
+  const estFirstGame = new Date(firstGame.getTime() + estOffset * 60 * 1000);
+
   const duration: number =
-    (now.getTime() - specificDate.getTime()) / (1000 * 60 * 60 * 24);
+    (now.getTime() - estFirstGame.getTime()) / (1000 * 60 * 60 * 24);
 
   return Math.floor(duration);
 }

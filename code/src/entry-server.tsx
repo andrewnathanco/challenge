@@ -1,5 +1,5 @@
-import { StartServer } from "@solidjs/start/server";
-import { createHandler } from "@solidjs/start/entry";
+// @refresh reload
+import { StartServer, createHandler } from "@solidjs/start/server";
 
 export default createHandler(() => (
   <StartServer
@@ -12,6 +12,7 @@ export default createHandler(() => (
             src="https://plausible.io/js/script.js"
           ></script>
           <meta charset="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="icon" href="/favicon.ico" />
           {assets}
         </head>
